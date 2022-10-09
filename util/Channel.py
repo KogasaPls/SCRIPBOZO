@@ -4,6 +4,7 @@ from dataclasses import field
 from typing import List
 
 from aiolimiter import AsyncLimiter
+from torch import Tensor
 
 import src.Config as Config
 from twitchio import Message
