@@ -5,7 +5,7 @@ TWITCH_AUTH_JSON: str = "twitch_auth.json"
 
 
 # Model
-MODEL_PATH: str = "model_bak"
+MODEL_PATH: str = "model"
 DEVICE: str = "cuda:0"
 NEWLINE_TOKEN_ID: int = 198  # GPT2Tokenizer.from_pretrained("gpt2").encode("\n")[0]
 MODEL_MAX_LENGTH: int = 512

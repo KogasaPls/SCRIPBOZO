@@ -1,13 +1,11 @@
 import logging
 from util.Channel import Channel, ChannelList
-from model.Tokenizer import Tokenizer
-from model.LanguageModel import LanguageModel
+from util.Tokenizer import Tokenizer
+from util.LanguageModel import LanguageModel
 from twitchio import Message
-from util.MessageIgnorer import MessageIgnorer
-from util.Pipeline import Pipeline
+from src.MessageIgnorer import MessageIgnorer
+from src.Pipeline import Pipeline
 from util.CustomLogger import CustomLogger
-import os
-
 from util.StringUtils import contains_self_mention
 
 log: logging.Logger = CustomLogger(__name__).get_logger()

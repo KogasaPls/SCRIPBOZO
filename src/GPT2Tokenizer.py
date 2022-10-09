@@ -1,5 +1,5 @@
 from torch import Tensor
-from model.Tokenizer import Tokenizer
+from util.Tokenizer import Tokenizer
 from logging import Logger
 from util.CustomLogger import CustomLogger
 from transformers.models.gpt2.tokenization_gpt2 import (

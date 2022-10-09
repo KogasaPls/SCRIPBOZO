@@ -1,7 +1,7 @@
 from logging import Handler, Logger, Formatter
 import logging
 import sys
-import config.Config as Config
+import src.Config as Config
 
 LOG_FORMAT: str = "[%(asctime)s] (%(levelname)s) %(name)s: %(message)s"
 DATE_FORMAT: str = "%H:%M:%S"

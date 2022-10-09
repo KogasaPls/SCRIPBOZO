@@ -1,7 +1,5 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABCMeta
 from typing import Any
-from model.Tokenizer import Tokenizer
-from abc import ABCMeta
 
 
 class LanguageModel(metaclass=ABCMeta):
@@ -10,7 +8,6 @@ class LanguageModel(metaclass=ABCMeta):
     be overridden by the implementations.
     """
 
-    tokenizer: Tokenizer
     model: Any
 
     @abstractmethod

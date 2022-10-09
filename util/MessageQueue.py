@@ -2,8 +2,8 @@ from util.StringUtils import remove_self_mentions
 from typing import List
 from twitchio import Message
 from torch import Tensor
-from model.Tokenizer import Tokenizer
-import config.Config as Config
+from util.Tokenizer import Tokenizer
+import src.Config as Config
 import logging
 import torch
 

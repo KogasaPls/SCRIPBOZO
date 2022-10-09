@@ -1,9 +1,9 @@
 from typing_extensions import Self
-import config.Config as Config
+import src.Config as Config
 from torch import Tensor
 from util.Channel import Channel
-from model.Tokenizer import Tokenizer
-from model.LanguageModel import LanguageModel
+from util.Tokenizer import Tokenizer
+from util.LanguageModel import LanguageModel
 from twitchio import Message
 import random
 
@@ -54,32 +54,6 @@ class OutputBuilder:
         return random.uniform(0, 1) < p
 
     def is_output_valid(self, line: str) -> bool:
-        return (
-            len(line) > 0
-            and (" " in line or self.roll(0.5))
-            and (len(line) >= 3 or self.roll(0.25))
-            and (len(line) <= Config.OUTPUT_MAX_LENGTH or self.roll(0.1))
-            and ("@" not in line or self.roll(0.05))
-            and ("fishmoley" not in line.lower() or self.roll(0.1))
-        )
-
-
-class OutputCleaner:
-    def clean_output(self, output: str) -> str | None:
-        split: list[str] = output.splitlines()
-        return self.get_first_acceptable_line(split)
-
-    def get_first_acceptable_line(self, lines: list[str]) -> str | None:
-        for line in lines:
-            if self.is_acceptable(line):
-                return line
-
-    def roll(self, p: float) -> bool:
-        return random.uniform(0, 1) < p
-
-    def is_acceptable(self, line: str) -> bool:
-        """Soft-filter for desirable conditions. Will let lines that don't
-        meet the conditions through with some probability."""
         return (
             len(line) > 0
             and (" " in line or self.roll(0.5))

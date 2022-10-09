@@ -1,11 +1,10 @@
-import os
 from torch import Tensor
 from util.Channel import Channel
-from model.Tokenizer import Tokenizer
-from model.LanguageModel import LanguageModel
+from util.Tokenizer import Tokenizer
+from util.LanguageModel import LanguageModel
 from twitchio import Message
-import config.Config as Config
-from util.Output import OutputBuilder
+import src.Config as Config
+from src.OutputBuilder import OutputBuilder
 from util.StringUtils import remove_self_mentions
 from util.TensorBuilder import TensorBuilder
 import logging

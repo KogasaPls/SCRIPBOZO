@@ -1,14 +1,12 @@
 import torch
 from torch import Tensor
 
-from model.LanguageModel import LanguageModel
+from util.LanguageModel import LanguageModel
 from transformers.models.gpt2.modeling_gpt2 import GPT2LMHeadModel as BaseModel
 from util.CustomLogger import CustomLogger
 from logging import Logger
-import config.Config as Config
-from transformers import StoppingCriteria
+import src.Config as Config
 
-from util.TensorBuilder import TensorBuilder
 
 log: Logger = CustomLogger(__name__).get_logger()
 
@@ -24,8 +22,8 @@ class GPT2Model(LanguageModel):
             Config.DEVICE
         )
 
-    def generate(self, tokens: Tensor) -> Tensor:
-        tokens: Tensor = self.trim_tokens_to_max_size(tokens)
+    def generate(self, _tokens: Tensor) -> Tensor:
+        tokens: Tensor = self.trim_tokens_to_max_size(_tokens)
         log.debug(f"generate({tokens})")
         attentionMask: Tensor = torch.ones_like(tokens)
 

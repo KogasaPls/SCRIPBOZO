@@ -6,11 +6,10 @@ import ujson
 import requests
 from datetime import datetime
 import logging
-import config.Config as Config
+import src.Config as Config
 from util.CustomLogger import CustomLogger
 
 TWITCH_OAUTH_URL: str = "https://id.twitch.tv/oauth2/token"
-
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 

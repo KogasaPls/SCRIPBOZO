@@ -1,9 +1,8 @@
 from argparse import Namespace
 from twitchio.ext import commands
-from util.MessageHandler import MessageHandler, Pipeline
-from util.Channel import ChannelList
-from model.GPT2Model import GPT2Model
-from model.GPT2Tokenizer import GPT2Tokenizer
+from src.MessageHandler import MessageHandler
+from src.GPT2Model import GPT2Model
+from src.GPT2Tokenizer import GPT2Tokenizer
 from util.EnvDefault import ArgParser
 from util.CustomLogger import CustomLogger
 from util.TwitchAuth import TwitchAuth
