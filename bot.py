@@ -1,13 +1,13 @@
+import logging
 from argparse import Namespace
-from twitchio.ext import commands
-from src.MessageHandler import MessageHandler
+
 from src.GPT2Model import GPT2Model
 from src.GPT2Tokenizer import GPT2Tokenizer
+from src.MessageHandler import MessageHandler
+from twitchio.ext import commands
+from util.CustomLogger import CustomLogger
 from util.EnvDefault import ArgParser
-from util.CustomLogger import CustomLogger
 from util.TwitchAuth import TwitchAuth
-from util.CustomLogger import CustomLogger
-import logging
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 

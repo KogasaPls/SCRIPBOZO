@@ -1,10 +1,12 @@
-from torch import Tensor
-from util.Tokenizer import Tokenizer
 from logging import Logger
-from util.CustomLogger import CustomLogger
+
+from torch import Tensor
 from transformers.models.gpt2.tokenization_gpt2 import (
     GPT2Tokenizer as BaseGPT2Tokenizer,
 )
+
+from util.CustomLogger import CustomLogger
+from util.Tokenizer import Tokenizer
 
 
 log: Logger = CustomLogger(__name__).get_logger()

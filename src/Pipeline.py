@@ -1,14 +1,16 @@
+import logging
+
 from torch import Tensor
-from util.Channel import Channel
-from util.Tokenizer import Tokenizer
-from util.LanguageModel import LanguageModel
-from twitchio import Message
+
 import src.Config as Config
 from src.OutputBuilder import OutputBuilder
+from twitchio import Message
+from util.Channel import Channel
+from util.CustomLogger import CustomLogger
+from util.LanguageModel import LanguageModel
 from util.StringUtils import remove_self_mentions
 from util.TensorBuilder import TensorBuilder
-import logging
-from util.CustomLogger import CustomLogger
+from util.Tokenizer import Tokenizer
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 

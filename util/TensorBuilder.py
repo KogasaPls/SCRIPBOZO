@@ -1,6 +1,6 @@
-from typing_extensions import Self
-from torch import Tensor
 import torch
+from torch import Tensor
+from typing_extensions import Self
 
 
 class TensorBuilder:

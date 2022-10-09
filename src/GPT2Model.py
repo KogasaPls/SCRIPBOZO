@@ -1,11 +1,12 @@
+from logging import Logger
+
 import torch
 from torch import Tensor
-
-from util.LanguageModel import LanguageModel
 from transformers.models.gpt2.modeling_gpt2 import GPT2LMHeadModel as BaseModel
-from util.CustomLogger import CustomLogger
-from logging import Logger
+
 import src.Config as Config
+from util.CustomLogger import CustomLogger
+from util.LanguageModel import LanguageModel
 
 
 log: Logger = CustomLogger(__name__).get_logger()

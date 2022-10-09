@@ -1,6 +1,9 @@
-from logging import Handler, Logger, Formatter
 import logging
 import sys
+from logging import Formatter
+from logging import Handler
+from logging import Logger
+
 import src.Config as Config
 
 LOG_FORMAT: str = "[%(asctime)s] (%(levelname)s) %(name)s: %(message)s"

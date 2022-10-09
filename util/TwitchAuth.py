@@ -1,11 +1,14 @@
-from dataclasses import dataclass, field
+import logging
+from dataclasses import dataclass
+from dataclasses import field
+from datetime import datetime
 from math import ceil
 from typing import Any
-from typing_extensions import Self
-import ujson
+
 import requests
-from datetime import datetime
-import logging
+import ujson
+from typing_extensions import Self
+
 import src.Config as Config
 from util.CustomLogger import CustomLogger
 

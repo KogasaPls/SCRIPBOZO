@@ -1,5 +1,5 @@
-import re
 import os
+import re
 
 
 def remove_self_mentions(text) -> str:

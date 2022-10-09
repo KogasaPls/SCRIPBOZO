@@ -1,11 +1,13 @@
-from typing_extensions import Self
-import src.Config as Config
-from torch import Tensor
-from util.Channel import Channel
-from util.Tokenizer import Tokenizer
-from util.LanguageModel import LanguageModel
-from twitchio import Message
 import random
+
+from torch import Tensor
+from typing_extensions import Self
+
+import src.Config as Config
+from twitchio import Message
+from util.Channel import Channel
+from util.LanguageModel import LanguageModel
+from util.Tokenizer import Tokenizer
 
 
 class OutputBuilder:

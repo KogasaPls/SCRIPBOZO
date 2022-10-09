@@ -1,15 +1,14 @@
-from util.StringUtils import remove_self_mentions
-from typing import List
-from twitchio import Message
-from torch import Tensor
-from util.Tokenizer import Tokenizer
-import src.Config as Config
 import logging
+from typing import List
+
 import torch
+from torch import Tensor
 
-from util.StringUtils import remove_self_mentions
-
+import src.Config as Config
+from twitchio import Message
 from util.CustomLogger import CustomLogger
+from util.StringUtils import remove_self_mentions
+from util.Tokenizer import Tokenizer
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 

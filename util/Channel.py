@@ -1,10 +1,13 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from typing import List
+
 from aiolimiter import AsyncLimiter
-from twitchio import Message
-from util.MessageQueue import *
+
 import src.Config as Config
+from twitchio import Message
 from util.CustomLogger import CustomLogger
+from util.MessageQueue import *
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 

@@ -1,4 +1,5 @@
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta
+from abc import abstractmethod
 from typing import Any
 
 
