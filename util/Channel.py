@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from dataclasses import field
 from typing import List
@@ -7,7 +8,8 @@ from aiolimiter import AsyncLimiter
 import src.Config as Config
 from twitchio import Message
 from util.CustomLogger import CustomLogger
-from util.MessageQueue import *
+from util.MessageQueue import MessageQueue
+from util.Tokenizer import Tokenizer
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 
