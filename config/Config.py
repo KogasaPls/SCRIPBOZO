@@ -5,7 +5,7 @@ TWITCH_AUTH_JSON: str = "twitch_auth.json"
 
 
 # Model
-MODEL_PATH: str = "/home/kogasa/git/ns/gpt2-twitch-chatter/data/output/model"
+MODEL_PATH: str = "model_bak"
 DEVICE: str = "cuda:0"
 NEWLINE_TOKEN_ID: int = 198  # GPT2Tokenizer.from_pretrained("gpt2").encode("\n")[0]
 MODEL_MAX_LENGTH: int = 512
@@ -23,3 +23,4 @@ MIN_LENGTH: int = 1
 
 RATE_LIMIT_SECONDS: int = 30
 CLIENT_TIMEOUT: int = 10
+MAX_RETRIES_FOR_REPLY: int = 50

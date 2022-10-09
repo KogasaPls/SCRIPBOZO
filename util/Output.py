@@ -41,7 +41,7 @@ class OutputBuilder:
 
     async def generate_until_valid(self) -> str:
         i: int = 0
-        while i < 50:
+        while i < Config.MAX_RETRIES_FOR_REPLY:
             i += 1
             generated: Tensor = self.model.generate(self.input)
             decoded: str = self.tokenizer.decode(generated).replace("\n", "").strip()
