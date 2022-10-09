@@ -8,6 +8,8 @@ from util.Pipeline import Pipeline
 from util.CustomLogger import CustomLogger
 import os
 
+from util.StringUtils import contains_self_mention
+
 log: logging.Logger = CustomLogger(__name__).get_logger()
 
 
@@ -37,15 +39,16 @@ class MessageHandler:
         if self.should_reply(message):
             await self.handle_reply(message, channel)
 
+    def should_reply(self, message: Message) -> bool:
+        if not message.content:
+            return False
+        return contains_self_mention(message.content)
+
     async def handle_reply(self, message: Message, channel: Channel) -> None:
         response: str | None = await Pipeline(
             self.model, self.tokenizer, channel
         ).reply(message)
+
         if response is not None:
             log.info(f"({channel}) Replying to {message.author.name}: {response}")
             await message.channel.send(response)
-
-    def should_reply(self, message: Message) -> bool:
-        if not message.content:
-            return False
-        return os.getenv("NICK").lower() in message.content.lower()
