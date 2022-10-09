@@ -71,7 +71,7 @@ class MessageQueue(List[TokenWrapper]):
     async def tokenize(self, tokenizer: Tokenizer) -> Tensor:
         num_tokens: int = 0
         for token_wrapper in self:
-            if num_tokens > Config.MODEL_MAX_LENGTH - 2 * Config.OUTPUT_MAX_LENGTH:
+            if num_tokens > self.max_tokens_in_input():
                 del token_wrapper
                 continue
 
@@ -79,6 +79,9 @@ class MessageQueue(List[TokenWrapper]):
             num_tokens += token_wrapper.get_num_tokens()
 
         return torch.cat(self.get_tokens(), dim=1)
+
+    def max_tokens_in_input(self) -> int:
+        return Config.MODEL_MAX_LENGTH - 2 * Config.OUTPUT_MAX_LENGTH
 
     def get_tokens(self) -> List[Tensor]:
         return [msg.tokens for msg in self if msg.tokens is not None]
