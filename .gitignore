@@ -127,3 +127,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Twitchio submodule
+twitchio/
+TwitchIO/
+
+# Auth info
+twitch_auth.json
+
+# Pipfile lock
+Pipfile.lock
