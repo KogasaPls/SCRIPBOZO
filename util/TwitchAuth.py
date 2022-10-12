@@ -28,7 +28,7 @@ class TwitchAuthData:
     def to_json(self) -> str:
         return ujson.dumps(self.data)
 
-    def write_to_file(self, path: str) -> None:
+    def save_to_file(self, path: str) -> None:
         with open(path, "w") as f:
             ujson.dump(self.data, f, indent=4)
 
@@ -90,8 +90,7 @@ class TwitchAuth:
 
     def save_to_file(self) -> None:
         log.info(f"Saving new auth data to {Config.TWITCH_AUTH_JSON}")
-        with open(Config.TWITCH_AUTH_JSON, "w") as f:
-            f.write(self.data.to_json())
+        self.data.save_to_file(Config.TWITCH_AUTH_JSON)
 
     def request_new_token_using_refresh(self) -> Any:
         log.info(f"Requesting new token using refresh token.")
