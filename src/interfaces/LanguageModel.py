@@ -5,5 +5,5 @@ from typing import Any
 
 class LanguageModel(metaclass=ABCMeta):
     @abstractmethod
-    def generate(self, input: Any) -> Any:
+    def generate(self, model_input: Any) -> Any:
         pass
