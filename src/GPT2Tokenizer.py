@@ -33,6 +33,3 @@ class GPT2Tokenizer(Tokenizer):
         decoded: str = self.wrappedTokenizer.decode(tokenized)
         log.debug(f"decoded: {decoded}")
         return decoded
-
-    def get_pad_token_id(self) -> int | None:
-        return self.wrappedTokenizer.pad_token_id
