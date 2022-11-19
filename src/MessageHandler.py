@@ -1,16 +1,23 @@
 import logging
 
+from src.interfaces.LanguageModel import LanguageModel
+from src.interfaces.Tokenizer import Tokenizer
 from src.MessageIgnorer import MessageIgnorer
 from src.Pipeline import Pipeline
+from src.util.Channel import Channel
+from src.util.Channel import ChannelList
+from src.util.CustomLogger import CustomLogger
+from src.util.StringUtils import contains_self_mention
 from twitchio import Message
-from util.Channel import Channel
-from util.Channel import ChannelList
-from util.CustomLogger import CustomLogger
-from util.LanguageModel import LanguageModel
-from util.StringUtils import contains_self_mention
-from util.Tokenizer import Tokenizer
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
+
+
+def should_reply(message: Message) -> bool:
+    if not message.content:
+        return False
+
+    return contains_self_mention(message.content)
 
 
 class MessageHandler:
@@ -31,24 +38,23 @@ class MessageHandler:
         if MessageIgnorer(message).should_ignore():
             return
 
-        log.debug(f"(#{message.channel.name}) {message.author.name}: {message.content}")
-
         channel: Channel = self.channels.get_channel(message.channel.name)
+        channel.debug(f"{message.author.name}: {message.content}")
+
         await channel.add_message(message)
 
-        if self.should_reply(message):
+        if should_reply(message):
             await self.handle_reply(message, channel)
 
-    def should_reply(self, message: Message) -> bool:
-        if not message.content:
-            return False
-        return contains_self_mention(message.content)
-
     async def handle_reply(self, message: Message, channel: Channel) -> None:
-        response: str | None = await Pipeline(
-            self.model, self.tokenizer, channel
-        ).reply(message)
+        if channel.frequencyLimit.is_rate_limited():
+            log.info("Rate limited, ignoring message.")
+            return
+
+        await channel.frequencyLimit.tick()
+        response: str | None = Pipeline(self.model, self.tokenizer, channel).reply(message)
 
         if response is not None:
-            log.info(f"({channel}) Replying to {message.author.name}: {response}")
+            channel.log(f"Replying to {message.author.name}: {response}")
             await message.channel.send(response)
+            channel.volumeLimit.tick()

@@ -4,10 +4,10 @@ from argparse import Namespace
 from src.GPT2Model import GPT2Model
 from src.GPT2Tokenizer import GPT2Tokenizer
 from src.MessageHandler import MessageHandler
+from src.util.CustomLogger import CustomLogger
+from src.util.EnvDefault import ArgParser
+from src.util.TwitchAuth import TwitchAuth
 from twitchio.ext import commands
-from util.CustomLogger import CustomLogger
-from util.EnvDefault import ArgParser
-from util.TwitchAuth import TwitchAuth
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 

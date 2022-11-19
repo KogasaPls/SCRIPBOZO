@@ -5,9 +5,9 @@ from transformers.models.gpt2.tokenization_gpt2 import (
     GPT2Tokenizer as BaseGPT2Tokenizer,
 )
 
-from util.CustomLogger import CustomLogger
-from util.Tokenizer import Tokenizer
-
+from src.interfaces.Tokenizer import Tokenizer
+from src.util.CustomLogger import CustomLogger
+from src.util.StringUtils import trim_text_to_max_length
 
 log: Logger = CustomLogger(__name__).get_logger()
 
@@ -21,8 +21,9 @@ class GPT2Tokenizer(Tokenizer):
 
     def encode(self, message: str) -> Tensor:
         log.debug(f"encode: {message}")
+        message = trim_text_to_max_length(message)
         encoded: Tensor = self.wrappedTokenizer.encode(
-            message + "\n", return_tensors="pt"
+            message + "\n", return_tensors="pt", truncation=True
         )  # type: ignore
         log.debug(f"encoded: {encoded}")
         return encoded
@@ -31,10 +32,7 @@ class GPT2Tokenizer(Tokenizer):
         log.debug(f"decode: {tokenized}")
         decoded: str = self.wrappedTokenizer.decode(tokenized)
         log.debug(f"decoded: {decoded}")
-        return decoded  # type: ignore
+        return decoded
 
-    def getPadTokenID(self) -> int | None:
+    def get_pad_token_id(self) -> int | None:
         return self.wrappedTokenizer.pad_token_id
-
-    def getWrappedTokenizer(self) -> BaseGPT2Tokenizer:
-        return self.wrappedTokenizer

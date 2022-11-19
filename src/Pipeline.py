@@ -3,14 +3,14 @@ import logging
 from torch import Tensor
 
 import src.Config as Config
+from src.interfaces.LanguageModel import LanguageModel
+from src.interfaces.Tokenizer import Tokenizer
 from src.OutputBuilder import OutputBuilder
+from src.util.Channel import Channel
+from src.util.CustomLogger import CustomLogger
+from src.util.StringUtils import remove_self_mentions
+from src.util.TensorBuilder import TensorBuilder
 from twitchio import Message
-from util.Channel import Channel
-from util.CustomLogger import CustomLogger
-from util.LanguageModel import LanguageModel
-from util.StringUtils import remove_self_mentions
-from util.TensorBuilder import TensorBuilder
-from util.Tokenizer import Tokenizer
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 
@@ -20,40 +20,35 @@ class Pipeline:
     tokenizer: Tokenizer
     channel: Channel
 
-    def __init__(
-        self, model: LanguageModel, tokenizer: Tokenizer, channel: Channel
-    ) -> None:
+    def __init__(self, model: LanguageModel, tokenizer: Tokenizer, channel: Channel) -> None:
         self.model = model
         self.tokenizer = tokenizer
         self.channel = channel
 
-    async def reply(self, message: Message) -> str | None:
-        log.info(f"({self.channel}) {message.author.name}: {message.content}")
-        if self.channel.is_rate_limited():
-            log.info("Rate limited, ignoring prompt.")
-            return
-
-        await self.channel.reset_limit()
-
+    def reply(self, message: Message) -> str | None:
+        self.channel.log(f"{message.author.name}: {message.content}")
         assert message.content
-        text: str = remove_self_mentions(message.content)
-        tokenizedMessage: Tensor = self.tokenizer.encode(text)
 
-        channelHistory: Tensor = await self.channel.get_tokens(self.tokenizer)
-        input: Tensor = (
+        text_to_encode: str = remove_self_mentions(message.content)
+        tokenized_message: Tensor = self.tokenizer.encode(text_to_encode)
+
+        channel_history: Tensor = self.channel.get_tokens(self.tokenizer)
+
+        input_tokens: Tensor = (
             TensorBuilder()
-            .append(channelHistory)
-            .appendNTimes(tokenizedMessage, Config.PROMPT_DUPLICATION_FACTOR)
+            .append(channel_history)
+            .append_n_times(tokenized_message, Config.PROMPT_DUPLICATION_FACTOR)
+            .left_trim_to_size(Config.MODEL_MAX_LENGTH)
             .build()
         )
 
-        return await self.generate(input)
+        return self.generate(input_tokens)
 
-    async def generate(self, input: Tensor | None = None) -> str:
+    def generate(self, input_tokens: Tensor | None = None) -> str:
         return (
-            await OutputBuilder()
-            .setModel(self.model)
-            .setTokenizer(self.tokenizer)
-            .setInput(input)
+            OutputBuilder()
+            .with_model(self.model)
+            .with_tokenizer(self.tokenizer)
+            .with_input(input_tokens)
             .build()
         )

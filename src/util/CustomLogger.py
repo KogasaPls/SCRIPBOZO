@@ -17,9 +17,9 @@ class CustomLogger:
     def __init__(self, name: str, level: str = Config.DEFAULT_LOG_LEVEL) -> None:
         self.name = name
         self.level = level
-        self.setup(name, level)
+        self.setup(level)
 
-    def setup(self, name: str, level: str) -> None:
+    def setup(self, level: str) -> None:
         logger: Logger = logging.getLogger()
         stream_handler: Handler = self.make_handler()
 
@@ -43,7 +43,8 @@ class CustomLogger:
             self.clear_handlers()
             logging.getLogger(self.name).addHandler(handler)
 
-    def make_handler(self) -> Handler:
+    @staticmethod
+    def make_handler() -> Handler:
         handler: Handler = logging.StreamHandler(sys.stdout)
         handler.setFormatter(Formatter(LOG_FORMAT, DATE_FORMAT))
         return handler

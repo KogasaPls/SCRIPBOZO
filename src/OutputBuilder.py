@@ -4,63 +4,65 @@ from torch import Tensor
 from typing_extensions import Self
 
 import src.Config as Config
-from twitchio import Message
-from util.Channel import Channel
-from util.LanguageModel import LanguageModel
-from util.Tokenizer import Tokenizer
+from src.interfaces.LanguageModel import LanguageModel
+from src.interfaces.Tokenizer import Tokenizer
+from src.util.Channel import Channel
+
+
+def roll(p: float) -> bool:
+    return random.uniform(0, 1) < p
+
+
+def is_output_valid(line: str) -> bool:
+    """Require a series of conditions with a specified chance of ignoring a failed check."""
+    return (
+        len(line) > 0
+        and (" " in line or roll(0.5))
+        and (len(line) >= 3 or roll(0.25))
+        and (len(line) <= Config.OUTPUT_MAX_LENGTH or roll(0.1))
+        and ("@" not in line or roll(0.05))
+        and ("fishmoley" not in line.lower() or roll(0.1))
+    )
 
 
 class OutputBuilder:
     channel: Channel
-    prompt: Message | None
     model: LanguageModel
     tokenizer: Tokenizer
     input: Tensor
 
-    def setChannel(self, channel: Channel) -> Self:
+    def with_channel(self, channel: Channel) -> Self:
         self.channel = channel
         return self
 
-    def setPrompt(self, prompt: Message) -> Self:
-        self.prompt = prompt
-        return self
-
-    def setModel(self, model: LanguageModel) -> Self:
+    def with_model(self, model: LanguageModel) -> Self:
         self.model = model
         return self
 
-    def setTokenizer(self, tokenizer: Tokenizer) -> Self:
+    def with_tokenizer(self, tokenizer: Tokenizer) -> Self:
         self.tokenizer = tokenizer
         return self
 
-    def setInput(self, input: Tensor | None = None) -> Self:
-        if input is not None:
-            self.input = input
+    def with_input(self, input_tokens: Tensor | None = None) -> Self:
+        if input_tokens is not None:
+            self.input = input_tokens
         return self
 
-    async def build(self) -> str:
-        return await self.generate_until_valid()
+    def build(self) -> str:
+        return self.generate_until_valid()
 
-    async def generate_until_valid(self) -> str:
+    def generate_until_valid(self) -> str:
         i: int = 0
         while i < Config.MAX_RETRIES_FOR_REPLY:
             i += 1
             generated: Tensor = self.model.generate(self.input)
-            decoded: str = self.tokenizer.decode(generated).replace("\n", "").strip()
-            if self.is_output_valid(decoded):
+            decoded: str = (
+                self.tokenizer.decode(generated)
+                .replace("\n", "")
+                .replace("<|endoftext|>", "")
+                .strip()
+            )
+            if is_output_valid(decoded):
                 return decoded
 
         return Config.ERROR_MESSAGE_COULD_NOT_GENERATE
-
-    def roll(self, p: float) -> bool:
-        return random.uniform(0, 1) < p
-
-    def is_output_valid(self, line: str) -> bool:
-        return (
-            len(line) > 0
-            and (" " in line or self.roll(0.5))
-            and (len(line) >= 3 or self.roll(0.25))
-            and (len(line) <= Config.OUTPUT_MAX_LENGTH or self.roll(0.1))
-            and ("@" not in line or self.roll(0.05))
-            and ("fishmoley" not in line.lower() or self.roll(0.1))
-        )
