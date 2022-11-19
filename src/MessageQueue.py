@@ -29,7 +29,7 @@ class TokenWrapper(WrapsMessage):
     message: Message
 
     def __init__(self, message: Message) -> None:
-        self.message = message
+        super().__init__(message)
         self.tokens = None
 
     def tokenize(self, tokenizer: Tokenizer) -> None:
