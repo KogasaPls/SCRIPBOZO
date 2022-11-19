@@ -49,9 +49,8 @@ class TokenWrapper(WrapsMessage):
         return self.tokens[0].shape[0]
 
     def tokenize_if_necessary(self, tokenizer: Tokenizer) -> None:
-        if self.has_tokens():
-            return
-        self.tokenize(tokenizer)
+        if not self.has_tokens():
+            self.tokenize(tokenizer)
 
 
 class MessageQueue(List[TokenWrapper]):
