@@ -9,8 +9,6 @@ log: Logger = CustomLogger(__name__).get_logger()
 
 
 class Tokenizer(metaclass=ABCMeta):
-    wrappedTokenizer = Any
-
     def __init__(self) -> None:
         log.debug("init")
 
@@ -21,6 +19,3 @@ class Tokenizer(metaclass=ABCMeta):
     @abstractmethod
     def decode(self, tokenized: Any) -> str:
         pass
-
-    def get_newline_token(self) -> Any:
-        return self.encode("\n")
