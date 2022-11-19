@@ -4,9 +4,9 @@ from torch import Tensor
 from typing_extensions import Self
 
 import src.Config as Config
+from src.Channel import Channel
 from src.interfaces.LanguageModel import LanguageModel
 from src.interfaces.Tokenizer import Tokenizer
-from src.util.Channel import Channel
 
 
 def roll(p: float) -> bool:

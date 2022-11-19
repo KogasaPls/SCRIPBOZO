@@ -7,10 +7,10 @@ from torch import Tensor
 
 import src.Config as Config
 from src.interfaces.Tokenizer import Tokenizer
+from src.MessageQueue import MessageQueue
+from src.RateLimiterImpl import FrequencyLimiter
+from src.RateLimiterImpl import VolumeLimiter
 from src.util.CustomLogger import CustomLogger
-from src.util.MessageQueue import MessageQueue
-from src.util.RateLimiterImpl import FrequencyLimiter
-from src.util.RateLimiterImpl import VolumeLimiter
 from twitchio import Message
 
 log: logging.Logger = CustomLogger(__name__).get_logger()

@@ -1,11 +1,11 @@
 import logging
 
+from src.Channel import Channel
+from src.Channel import ChannelList
 from src.interfaces.LanguageModel import LanguageModel
 from src.interfaces.Tokenizer import Tokenizer
 from src.MessageIgnorer import MessageIgnorer
 from src.Pipeline import Pipeline
-from src.util.Channel import Channel
-from src.util.Channel import ChannelList
 from src.util.CustomLogger import CustomLogger
 from src.util.StringUtils import contains_self_mention
 from twitchio import Message

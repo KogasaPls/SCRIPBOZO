@@ -3,10 +3,10 @@ import logging
 from torch import Tensor
 
 import src.Config as Config
+from src.Channel import Channel
 from src.interfaces.LanguageModel import LanguageModel
 from src.interfaces.Tokenizer import Tokenizer
 from src.OutputBuilder import OutputBuilder
-from src.util.Channel import Channel
 from src.util.CustomLogger import CustomLogger
 from src.util.StringUtils import remove_self_mentions
 from src.util.TensorBuilder import TensorBuilder
