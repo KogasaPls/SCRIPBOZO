@@ -13,7 +13,7 @@ class TensorBuilder:
         self.tensor = torch.cat((self.tensor, tensor), dim=1)
         return self
 
-    def appendNTimes(self, tensor: Tensor, n: int) -> Self:
+    def append_n_times(self, tensor: Tensor, n: int) -> Self:
         for _ in range(n):
             self.append(tensor)
         return self
@@ -22,6 +22,11 @@ class TensorBuilder:
         self.tensor = self.tensor[-n:]
         return self
 
-    def removeInitialTokens(self, n: int) -> Self:
+    def remove_initial_tokens(self, n: int) -> Self:
         self.tensor = self.tensor[:, n:]
+        return self
+
+    def left_trim_to_size(self, n: int) -> Self:
+        if self.tensor.size(1) > n:
+            self.tensor = self.tensor[:, -n:]
         return self

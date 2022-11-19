@@ -5,8 +5,7 @@ from typing import Any
 
 class LanguageModel(metaclass=ABCMeta):
     """
-    Abstract class for a language model. Contains abstract methods that must
-    be overridden by the implementations.
+    Abstract class for a language model.
     """
 
     model: Any

@@ -3,16 +3,12 @@ from abc import abstractmethod
 from logging import Logger
 from typing import Any
 
-from util.CustomLogger import CustomLogger
-
+from src.util.CustomLogger import CustomLogger
 
 log: Logger = CustomLogger(__name__).get_logger()
 
 
 class Tokenizer(metaclass=ABCMeta):
-    """Abstract class for a tokenizer. Contains abstract methods that must be
-    overridden by the concrete tokenizer."""
-
     wrappedTokenizer = Any
 
     def __init__(self) -> None:
@@ -24,10 +20,6 @@ class Tokenizer(metaclass=ABCMeta):
 
     @abstractmethod
     def decode(self, tokenized: Any) -> str:
-        pass
-
-    @abstractmethod
-    def getWrappedTokenizer(self) -> Any:
         pass
 
     def get_newline_token(self) -> Any:

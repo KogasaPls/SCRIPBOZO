@@ -5,33 +5,42 @@ from torch import Tensor
 from transformers.models.gpt2.modeling_gpt2 import GPT2LMHeadModel as BaseModel
 
 import src.Config as Config
-from util.CustomLogger import CustomLogger
-from util.LanguageModel import LanguageModel
-
+from src.interfaces.LanguageModel import LanguageModel
+from src.util.CustomLogger import CustomLogger
+from src.util.TensorBuilder import TensorBuilder
 
 log: Logger = CustomLogger(__name__).get_logger()
+
+
+def get_device_from_config() -> torch.device:
+    if (Config.DEVICE == "cuda:0") and not torch.cuda.is_available():
+        return torch.device("cpu")
+    return torch.device(Config.DEVICE)
 
 
 class GPT2Model(LanguageModel):
     wrappedModel: BaseModel
     device: torch.device
+    maxLength: int = Config.MODEL_MAX_LENGTH
+    maxOutputLength: int = Config.OUTPUT_MAX_LENGTH
 
     def __init__(self) -> None:
         super().__init__()
-        self.device = self.set_device_from_config()
-        self.wrappedModel = BaseModel.from_pretrained(Config.MODEL_PATH).to(
-            Config.DEVICE
-        )
+        self.device = get_device_from_config()
+        self.wrappedModel = BaseModel.from_pretrained(Config.MODEL_PATH).to(Config.DEVICE)
 
     def generate(self, _tokens: Tensor) -> Tensor:
-        tokens: Tensor = self.trim_tokens_to_max_size(_tokens)
-        log.debug(f"generate({tokens})")
-        attentionMask: Tensor = torch.ones_like(tokens)
+        log.debug(f"generate({_tokens})")
+
+        tokens: Tensor = self.trim_tokens_to_max_input_length(_tokens)
+        attention_mask: Tensor = torch.ones_like(tokens)
+
+        assert self.maxOutputLength < self.maxLength
 
         generated: Tensor = self.wrappedModel.generate(
             tokens.to(Config.DEVICE),
-            attention_mask=attentionMask.to(Config.DEVICE),
-            max_length=self.get_max_length(),
+            attention_mask=attention_mask.to(Config.DEVICE),
+            max_new_tokens=self.maxOutputLength,
             temperature=Config.TEMPERATURE,
             top_k=Config.TOP_K,
             top_p=Config.TOP_P,
@@ -39,7 +48,6 @@ class GPT2Model(LanguageModel):
             repetition_penalty=Config.REPETITION_PENALTY,
             min_length=Config.MIN_LENGTH,
             eos_token_id=Config.NEWLINE_TOKEN_ID,
-            pad_token_id=Config.NEWLINE_TOKEN_ID,
             do_sample=True,
             num_return_sequences=1,
         )[0]
@@ -47,13 +55,12 @@ class GPT2Model(LanguageModel):
         # strip input tokens from output
         return generated[tokens.shape[1] :]
 
-    def trim_tokens_to_max_size(self, tokens: Tensor) -> Tensor:
-        return tokens[-self.get_max_length() :]
+    def get_max_input_length(self) -> int:
+        return self.maxLength - self.maxOutputLength
 
-    def get_max_length(self) -> int:
-        return self.wrappedModel.config.n_positions
-
-    def set_device_from_config(self) -> torch.device:
-        if (Config.DEVICE == "cuda:0") and torch.cuda.is_available():
-            return torch.device("cuda:0")
-        return torch.device("cpu")
+    def trim_tokens_to_max_input_length(self, tokens: Tensor) -> Tensor:
+        max_input_length: int = self.maxLength - self.maxOutputLength
+        if tokens.shape[1] > max_input_length:
+            log.debug(f"trimming tokens to max size: {tokens.shape[1]} > {max_input_length}")
+            tokens = TensorBuilder().append(tokens).left_trim_to_size(max_input_length).build()
+        return tokens
