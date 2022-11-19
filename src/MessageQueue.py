@@ -35,7 +35,6 @@ class TokenWrapper(WrapsMessage):
     def tokenize(self, tokenizer: Tokenizer) -> None:
         if self.has_tokens() or self.message_is_empty():
             return
-        assert self.message.content
         cleaned: str = remove_self_mentions(self.message.content)
         self.set_tokens(tokenizer.encode(cleaned))
 
