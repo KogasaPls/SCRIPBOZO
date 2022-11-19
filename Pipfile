@@ -4,12 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [[source]]
-url = "https://download.pytorch.org/whl/rocm5.1.1"
+url = "https://download.pytorch.org/whl/rocm5.2"
 verify_ssl = false
 name = "torch_rocm"
 
 [packages]
-torch = {version="*", index="torch_rocm"}
+torch = { version = "*", index = "torch_rocm" }
 twitchio = "*"
 torchvision = "*"
 torchaudio = "*"

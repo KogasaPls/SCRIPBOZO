@@ -135,8 +135,5 @@ TwitchIO/
 # Auth info
 twitch_auth.json
 
-# Pipfile lock
-Pipfile.lock
-
 # Model
 model/*
