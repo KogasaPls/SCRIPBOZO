@@ -19,6 +19,7 @@ aiolimiter = "*"
 ujson = "*"
 aioschedule = "*"
 iso8601 = "*"
+requests = "*"
 
 [dev-packages]
 pylint = "*"

@@ -19,7 +19,8 @@ log: logging.Logger = CustomLogger(__name__).get_logger()
 
 @dataclass
 class TwitchAuthData:
-    "Data type for the response from the Twitch API."
+    """Data type for the response from the Twitch API."""
+
     data: dict[str, Any] = field(default_factory=dict)
 
     def __str__(self) -> str:
@@ -69,7 +70,7 @@ class TwitchAuth:
 
     def setup_refresh_token(self) -> None:
         try:
-            self.data = self.load_from_file()
+            self.data = TwitchAuth.load_from_file()
         except Exception as e:
             log.exception(e)
             self.data = TwitchAuthData()
@@ -77,7 +78,8 @@ class TwitchAuth:
         if self.data.is_expired():
             self.refresh_token()
 
-    def load_from_file(self) -> TwitchAuthData:
+    @staticmethod
+    def load_from_file() -> TwitchAuthData:
         log.info(f"Loading auth data from {Config.TWITCH_AUTH_JSON}")
         with open(Config.TWITCH_AUTH_JSON, "r") as f:
             file: str = f.read()
