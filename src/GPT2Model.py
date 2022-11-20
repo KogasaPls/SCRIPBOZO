@@ -23,6 +23,7 @@ class GPT2Model(LanguageModel):
     device: torch.device
     maxLength: int = Config.MODEL_MAX_LENGTH
     maxOutputLength: int = Config.OUTPUT_MAX_LENGTH
+    assert maxOutputLength < maxLength
 
     def __init__(self) -> None:
         super().__init__()
@@ -34,8 +35,6 @@ class GPT2Model(LanguageModel):
 
         tokens: Tensor = self.trim_tokens_to_max_input_length(_tokens)
         attention_mask: Tensor = torch.ones_like(tokens)
-
-        assert self.maxOutputLength < self.maxLength
 
         generated: Tensor = self.wrappedModel.generate(
             tokens.to(Config.DEVICE),
