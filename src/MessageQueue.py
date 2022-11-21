@@ -94,4 +94,5 @@ class MessageQueue(List[TokenWrapper]):
         return Config.MODEL_MAX_TOKENS - Config.OUTPUT_MAX_TOKENS
 
     def get_tokens(self) -> List[Tensor]:
+        """Return a list of tokenized messages in chronological order (newest last)."""
         return [msg.tokens for msg in self if msg.tokens is not None][: self.max_tokens_in_input()]
