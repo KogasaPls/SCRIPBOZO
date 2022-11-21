@@ -73,14 +73,12 @@ class MessageQueue(List[TokenWrapper]):
             # If there's still room in the input, tokenize the message.
             if num_tokens < max_tokens:
                 msg.tokenize_if_necessary(tokenizer)
+                num_tokens += msg.get_num_tokens()
+                idx += 1
             # If the list is too big now, delete these tokens and any later ones.
             if num_tokens >= max_tokens:
                 del msg.tokens
                 del msg
-            # Otherwise, we keep the tokens and increment the counters.
-            else:
-                num_tokens += msg.get_num_tokens()
-                idx += 1
         # Free up memory from deleted tokens/wrappers.
         gc.collect()
 
