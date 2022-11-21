@@ -66,7 +66,6 @@ class MessageQueue(List[TokenWrapper]):
         """Starting from the newest messages, tokenize if necessary and then
         add to the list to be returned."""
         num_tokens: int = 0
-        idx: int = 0
         max_tokens = self.max_tokens_in_input()
 
         for msg in reversed(self):
@@ -74,10 +73,8 @@ class MessageQueue(List[TokenWrapper]):
             if num_tokens < max_tokens:
                 msg.tokenize_if_necessary(tokenizer)
                 num_tokens += msg.get_num_tokens()
-                idx += 1
             # If the list is too big now, delete these tokens and any later ones.
             if num_tokens >= max_tokens:
-                del msg.tokens
                 del msg
         # Free up memory from deleted tokens/wrappers.
         gc.collect()
