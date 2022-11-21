@@ -11,8 +11,6 @@ name = "torch_rocm"
 [packages]
 torch = { version = "*", index = "torch_rocm" }
 twitchio = "*"
-torchvision = "*"
-torchaudio = "*"
 transformers = "*"
 datasets = "*"
 aiolimiter = "*"

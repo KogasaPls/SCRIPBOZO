@@ -19,7 +19,7 @@ def is_output_valid(line: str) -> bool:
         len(line) > 0
         and (" " in line or roll(0.5))
         and (len(line) >= 3 or roll(0.25))
-        and (len(line) <= Config.OUTPUT_MAX_LENGTH or roll(0.1))
+        and (len(line) <= Config.OUTPUT_MAX_TOKENS or roll(0.1))
         and ("@" not in line or roll(0.05))
         and ("fishmoley" not in line.lower() or roll(0.1))
     )

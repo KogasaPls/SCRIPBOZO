@@ -21,8 +21,8 @@ def get_device_from_config() -> torch.device:
 class GPT2Model(LanguageModel):
     wrappedModel: BaseModel
     device: torch.device
-    maxLength: int = Config.MODEL_MAX_LENGTH
-    maxOutputLength: int = Config.OUTPUT_MAX_LENGTH
+    maxLength: int = Config.MODEL_MAX_TOKENS
+    maxOutputLength: int = Config.OUTPUT_MAX_TOKENS
     assert maxOutputLength < maxLength
 
     def __init__(self) -> None:
@@ -45,10 +45,12 @@ class GPT2Model(LanguageModel):
             top_p=Config.TOP_P,
             no_repeat_ngram_size=Config.NO_REPEAT_NGRAM_SIZE,
             repetition_penalty=Config.REPETITION_PENALTY,
+            length_penalty=Config.LENGTH_PENALTY,
             min_length=Config.MIN_LENGTH,
             eos_token_id=Config.NEWLINE_TOKEN_ID,
             do_sample=True,
             num_return_sequences=1,
+            use_cache=False,
         )[0]
 
         # strip input tokens from output

@@ -38,7 +38,7 @@ class Pipeline:
             TensorBuilder()
             .append(channel_history)
             .append_n_times(tokenized_message, Config.PROMPT_DUPLICATION_FACTOR)
-            .left_trim_to_size(Config.MODEL_MAX_LENGTH)
+            .left_trim_to_size(Config.MODEL_MAX_TOKENS)
             .build()
         )
 
