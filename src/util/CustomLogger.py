@@ -3,6 +3,7 @@ import sys
 from logging import Formatter
 from logging import Handler
 from logging import Logger
+from typing import List
 
 import src.Config as Config
 
@@ -21,12 +22,12 @@ class CustomLogger:
 
     def setup(self, level: str) -> None:
         logger: Logger = logging.getLogger()
-        stream_handler: Handler = self.make_handler()
+        handlers: List[Handler] = self.make_handlers()
 
         logging.Formatter(LOG_FORMAT)
         logger.setLevel(level)
 
-        self.set_handler_if_not_set(stream_handler)
+        self.set_handlers_if_not_set(handlers)
 
         logger.info("Started logger.")
 
@@ -36,15 +37,32 @@ class CustomLogger:
     def clear_handlers(self) -> None:
         logging.getLogger(self.name).handlers.clear()
 
-    def set_handler_if_not_set(self, handler: Handler) -> None:
+    def set_handlers_if_not_set(self, handlers: List[Handler]) -> None:
         current_handlers: list[Handler] = logging.getLogger(self.name).handlers
-        desired_handlers: list[Handler] = [handler]
-        if current_handlers != desired_handlers:
+        if current_handlers != handlers:
             self.clear_handlers()
+            self.set_handlers(handlers)
+
+    def set_handlers(self, handlers: List[Handler]) -> None:
+        for handler in handlers:
             logging.getLogger(self.name).addHandler(handler)
 
     @staticmethod
-    def make_handler() -> Handler:
+    def make_handlers() -> list[Handler]:
+        handlers: List[Handler] = []
+        if Config.LOG_FILE:
+            handlers.append(CustomLogger.make_file_handler(Config.LOG_FILE))
+        handlers.append(CustomLogger.make_stdout_handler())
+        return handlers
+
+    @staticmethod
+    def make_stdout_handler() -> Handler:
         handler: Handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(Formatter(LOG_FORMAT, DATE_FORMAT))
+        return handler
+
+    @staticmethod
+    def make_file_handler(filename: str) -> Handler:
+        handler: Handler = logging.FileHandler(filename)
         handler.setFormatter(Formatter(LOG_FORMAT, DATE_FORMAT))
         return handler
