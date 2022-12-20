@@ -48,13 +48,29 @@ class ChannelList(List[Channel]):
     def __init__(self) -> None:
         super().__init__()
 
+    def contains(self, name: str) -> bool:
+        for channel in self:
+            if channel.name == name:
+                return True
+        return False
+
     def get_channel(self, name: str) -> Channel:
         for channel in self:
             if channel.name == name:
                 return channel
-        return self.add_channel(name)
 
-    def add_channel(self, name: str) -> Channel:
-        channel: Channel = Channel(name)
+        channel = Channel(name)
         self.append(channel)
         return channel
+
+    def get_channel_if_exists(self, name: str) -> Channel | None:
+        for channel in self:
+            if channel.name == name:
+                return channel
+        return None
+
+    def add_channel(self, channel: Channel) -> None:
+        self.append(channel)
+
+    def remove_channel(self, channel: Channel) -> None:
+        self.remove(channel)

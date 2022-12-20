@@ -1,4 +1,5 @@
 import random
+from logging import Logger
 
 from torch import Tensor
 from typing_extensions import Self
@@ -7,7 +8,9 @@ import src.Config as Config
 from src.Channel import Channel
 from src.interfaces.LanguageModel import LanguageModel
 from src.interfaces.Tokenizer import Tokenizer
+from src.util.CustomLogger import CustomLogger
 
+log: Logger = CustomLogger(__name__).get_logger()
 
 def roll(p: float) -> bool:
     return random.uniform(0, 1) < p
@@ -55,14 +58,18 @@ class OutputBuilder:
         i: int = 0
         while i < Config.MAX_RETRIES_FOR_REPLY:
             i += 1
-            generated: Tensor = self.model.generate(self.input)
-            decoded: str = (
-                self.tokenizer.decode(generated)
-                .replace("\n", "")
-                .replace("<|endoftext|>", "")
-                .strip()
-            )
-            if is_output_valid(decoded):
-                return decoded
+            try:
+                generated: Tensor = self.model.generate(self.input)
+                decoded: str = (
+                    self.tokenizer.decode(generated)
+                    .replace("\n", "")
+                    .replace("<|endoftext|>", "")
+                    .strip()
+                )
+                if is_output_valid(decoded):
+                    return decoded
+            except Exception as e:
+                log.info(f"Error while generating: {e}")
+                pass
 
         return Config.ERROR_MESSAGE_COULD_NOT_GENERATE

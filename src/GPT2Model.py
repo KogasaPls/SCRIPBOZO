@@ -50,11 +50,10 @@ class GPT2Model(LanguageModel):
             eos_token_id=Config.NEWLINE_TOKEN_ID,
             do_sample=True,
             num_return_sequences=1,
-            use_cache=False,
         )[0]
 
         # strip input tokens from output
-        return generated[tokens.shape[1] :]
+        return generated[tokens.shape[1]:]
 
     def get_max_input_length(self) -> int:
         return self.maxLength - self.maxOutputLength

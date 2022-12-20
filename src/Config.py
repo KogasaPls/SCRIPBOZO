@@ -27,3 +27,5 @@ RATE_LIMIT_VOLUME: int = 50
 
 CLIENT_TIMEOUT: int = 10
 MAX_RETRIES_FOR_REPLY: int = 50
+
+LOG_FILE: str = "log.txt"

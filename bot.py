@@ -1,13 +1,19 @@
 import argparse
 import logging
+import sys
+import traceback
 from argparse import Namespace
 
+from src.Command import Command
+from src.CommandHandler import CommandHandler
 from src.GPT2Model import GPT2Model
 from src.GPT2Tokenizer import GPT2Tokenizer
 from src.MessageHandler import MessageHandler
+from src.MessageIgnorer import MessageIgnorer
 from src.TwitchAuth import TwitchAuth
 from src.util.CustomLogger import CustomLogger
 from src.util.EnvDefault import ArgParser
+from twitchio import Message
 from twitchio.ext import commands
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
@@ -24,14 +30,19 @@ def get_args_from_env() -> argparse.Namespace:
 
 class Bot(commands.Bot):
     args: Namespace = get_args_from_env()
-    handler: MessageHandler
+    message_handler: MessageHandler
     auth: TwitchAuth = TwitchAuth(
         client_id=args.client_id,
         client_secret=args.client_secret,
     )
 
-    def __init__(self, message_handler: MessageHandler) -> None:
-        self.handler = message_handler
+    def get_new_message_handler(self) -> MessageHandler:
+        model: GPT2Model = GPT2Model()
+        tokenizer: GPT2Tokenizer = GPT2Tokenizer()
+        return MessageHandler(model, tokenizer)
+
+    def __init__(self) -> None:
+        self.message_handler = self.get_new_message_handler()
         super().__init__(
             client_secret=self.args.client_secret,
             client_id=self.args.client_id,
@@ -45,10 +56,53 @@ class Bot(commands.Bot):
         log.info(f"Logged in as {self.nick}")
 
     async def event_message(self, message) -> None:
-        await handler.handle_message(message)
+        if MessageIgnorer(message).should_ignore():
+            return
+
+        command: Command = CommandHandler.try_parse_command(message)
+        if command is not None:
+            await self.handle_command(command, message)
+            return
+
+        await self.message_handler.handle_message(message)
+
+    async def handle_command(self, command: Command, message: Message):
+        if not self.is_sender_privileged(message):
+            return
+
+        print(f"Command: {command}")
+
+        match command:
+            case Command.HELP:
+                await message.channel.send("Commands: !help, !restart, !sleep, !resume, !quit")
+            case Command.RESTART:
+                log.info("Restarting...")
+                await message.channel.send("NOOO")
+                self.message_handler = self.get_new_message_handler()
+            case Command.SLEEP:
+                self.message_handler.ignore_channel(message.channel.name)
+                await message.channel.send("Bedge")
+            case Command.RESUME:
+                self.message_handler.unignore_channel(message.channel.name)
+                await message.channel.send("Wokege")
+            case Command.QUIT | Command.CUM:
+                await message.channel.send("moon2CL")
+            case _:
+                pass
+
+    async def event_token_expired(self):
+        self.auth.refresh_token()
+        return self.auth.get_token()
+
+    def is_sender_privileged(self, message: Message) -> bool:
+        return message.author.name.lower() == "kogasapls" or message.author.is_mod or message.author.is_broadcaster
 
 
 if __name__ == "__main__":
-    handler: MessageHandler = MessageHandler(GPT2Model(), GPT2Tokenizer())
-    bot: Bot = Bot(handler)
+    bot: Bot = Bot()
     bot.run()
+
+
+    @bot.event()
+    async def event_error(error, data):
+        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)

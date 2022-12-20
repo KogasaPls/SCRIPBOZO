@@ -4,20 +4,12 @@ from src.Channel import Channel
 from src.Channel import ChannelList
 from src.interfaces.LanguageModel import LanguageModel
 from src.interfaces.Tokenizer import Tokenizer
-from src.MessageIgnorer import MessageIgnorer
 from src.Pipeline import Pipeline
 from src.util.CustomLogger import CustomLogger
 from src.util.StringUtils import contains_self_mention
 from twitchio import Message
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
-
-
-def should_reply(message: Message) -> bool:
-    if not message.content:
-        return False
-
-    return contains_self_mention(message.content)
 
 
 class MessageHandler:
@@ -29,21 +21,39 @@ class MessageHandler:
     model: LanguageModel
     tokenizer: Tokenizer
     channels: ChannelList = ChannelList()
+    ignored_channels: ChannelList = ChannelList()
 
     def __init__(self, model: LanguageModel, tokenizer: Tokenizer) -> None:
         self.model: LanguageModel = model
         self.tokenizer: Tokenizer = tokenizer
 
-    async def handle_message(self, message: Message) -> None:
-        if MessageIgnorer(message).should_ignore():
-            return
+    def should_reply(self, message: Message) -> bool:
+        if not message.content:
+            log.debug("Message has no content, ignoring.")
+            return False
+        if self.ignored_channels.contains(message.channel.name):
+            log.debug("Channel is ignored, ignoring message.")
+            return False
 
+        return contains_self_mention(message.content)
+
+    def ignore_channel(self, channel_name: str) -> None:
+        channel: Channel = self.channels.get_channel_if_exists(channel_name)
+        if channel:
+            self.ignored_channels.add_channel(channel)
+
+    def unignore_channel(self, channel_name: str) -> None:
+        channel: Channel | None = self.ignored_channels.get_channel_if_exists(channel_name)
+        if channel:
+            self.ignored_channels.remove_channel(channel)
+
+    async def handle_message(self, message: Message) -> None:
         channel: Channel = self.channels.get_channel(message.channel.name)
         channel.debug(f"{message.author.name}: {message.content}")
 
         await channel.add_message(message)
 
-        if should_reply(message):
+        if self.should_reply(message):
             await self.handle_reply(message, channel)
 
     async def handle_reply(self, message: Message, channel: Channel) -> None:
