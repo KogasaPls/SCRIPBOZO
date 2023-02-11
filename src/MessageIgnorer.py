@@ -12,8 +12,13 @@ class MessageIgnorer:
         "poopthefirst",
         "markov_chain_bot",
         "sumbot",
-        "scripbozo",
+        "scripbozo"
     ]
+
+    blacklisted_users: list[str] = [
+        "ruinsofmaya"
+    ]
+
     shouldIgnore: bool = False
 
     def __init__(self, message: Message) -> None:
@@ -21,7 +26,7 @@ class MessageIgnorer:
 
     def should_ignore(self) -> bool:
         return self.should_always_ignore() or (
-            self.should_usually_ignore() and not self.should_never_ignore()
+                self.should_usually_ignore() and not self.should_never_ignore()
         )
 
     def should_always_ignore(self) -> bool:
@@ -40,7 +45,10 @@ class MessageIgnorer:
         return self.message.echo
 
     def is_user_bot(self) -> bool:
-        return self.message.author.name in self.bot_usernames
+        return (
+                self.message.author.name in self.bot_usernames
+                or self.message.author.name in self.blacklisted_users
+        )
 
     def is_user_privileged(self) -> bool:
         return self.is_user_mod() or self.is_user_broadcaster()
