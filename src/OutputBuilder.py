@@ -20,11 +20,11 @@ def roll(p: float) -> bool:
 def is_output_valid(line: str) -> bool:
     """Require a series of conditions with a specified chance of ignoring a failed check."""
     return (
-            len(line) > 0
-            and (" " in line or roll(0.5))
-            and (len(line) >= 3 or roll(0.25))
-            and (len(line) <= Config.OUTPUT_MAX_TOKENS or roll(0.1))
-            and ("@" not in line or roll(0.05))
+        len(line) > 0
+        and (" " in line or roll(0.5))
+        and (len(line) >= 3 or roll(0.25))
+        and (len(line) <= Config.OUTPUT_MAX_TOKENS or roll(0.1))
+        and ("@" not in line or roll(0.05))
     )
 
 

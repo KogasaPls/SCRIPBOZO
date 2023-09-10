@@ -4,12 +4,12 @@ from typing import List
 
 import torch
 from torch import Tensor
+from twitchio import Message
 
 import src.Config as Config
 from src.interfaces.Tokenizer import Tokenizer
 from src.util.CustomLogger import CustomLogger
 from src.util.StringUtils import remove_self_mentions
-from twitchio import Message
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 
@@ -22,7 +22,11 @@ class WrapsMessage:
         return self.message
 
     def message_is_empty(self) -> bool:
-        return self.message is None or self.message.content is None or self.message.content == ""
+        return (
+            self.message is None
+            or self.message.content is None
+            or self.message.content == ""
+        )
 
 
 class TokenWrapper(WrapsMessage):
@@ -90,4 +94,6 @@ class MessageQueue(List[TokenWrapper]):
 
     def get_tokens(self) -> List[Tensor]:
         """Return a list of tokenized messages in chronological order (newest last)."""
-        return [msg.tokens for msg in self if msg.tokens is not None][: self.max_tokens_in_input()]
+        return [msg.tokens for msg in self if msg.tokens is not None][
+            : self.max_tokens_in_input()
+        ]

@@ -28,7 +28,9 @@ class GPT2Model(LanguageModel):
     def __init__(self) -> None:
         super().__init__()
         self.device = get_device_from_config()
-        self.wrappedModel = BaseModel.from_pretrained(Config.MODEL_PATH).to(Config.DEVICE)
+        self.wrappedModel = BaseModel.from_pretrained(Config.MODEL_PATH).to(
+            Config.DEVICE
+        )
 
     def generate(self, _tokens: Tensor) -> Tensor:
         log.debug(f"generate({_tokens})")
@@ -52,7 +54,7 @@ class GPT2Model(LanguageModel):
         )[0]
 
         # strip input tokens from output
-        return generated[tokens.shape[1]:]
+        return generated[tokens.shape[1] :]
 
     def get_max_input_length(self) -> int:
         return self.maxLength - self.maxOutputLength
@@ -60,6 +62,13 @@ class GPT2Model(LanguageModel):
     def trim_tokens_to_max_input_length(self, tokens: Tensor) -> Tensor:
         max_input_length: int = self.maxLength - self.maxOutputLength
         if tokens.shape[1] > max_input_length:
-            log.debug(f"trimming tokens to max size: {tokens.shape[1]} > {max_input_length}")
-            tokens = TensorBuilder().append(tokens).left_trim_to_size(max_input_length).build()
+            log.debug(
+                f"trimming tokens to max size: {tokens.shape[1]} > {max_input_length}"
+            )
+            tokens = (
+                TensorBuilder()
+                .append(tokens)
+                .left_trim_to_size(max_input_length)
+                .build()
+            )
         return tokens

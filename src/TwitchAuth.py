@@ -54,7 +54,9 @@ class TwitchAuthData:
         return self
 
     def is_expired(self) -> bool:
-        log.debug(f"Refresh token expires at {datetime.fromtimestamp(self.get_expiration_time())}.")
+        log.debug(
+            f"Refresh token expires at {datetime.fromtimestamp(self.get_expiration_time())}."
+        )
         return self.get_expiration_time() < ceil(datetime.now().timestamp())
 
 

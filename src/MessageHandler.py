@@ -45,7 +45,8 @@ class MessageHandler:
 
     def unignore_channel(self, channel_name: str) -> None:
         channel: Channel | None = self.ignored_channels.get_channel_if_exists(
-            channel_name)
+            channel_name
+        )
         if channel and self.ignored_channels.contains(channel_name):
             log.info(f"Unignoring channel {channel_name}")
             self.ignored_channels.remove_channel(channel)
@@ -66,7 +67,8 @@ class MessageHandler:
 
         await channel.frequencyLimit.tick()
         response: str | None = Pipeline(self.model, self.tokenizer, channel).reply(
-            message)
+            message
+        )
 
         if response is not None:
             channel.log(f"Replying to {message.author.name}: {response}")

@@ -1,6 +1,7 @@
 import logging
 
 from torch import Tensor
+from twitchio import Message
 
 import src.Config as Config
 from src.Channel import Channel
@@ -10,7 +11,6 @@ from src.OutputBuilder import OutputBuilder
 from src.util.CustomLogger import CustomLogger
 from src.util.StringUtils import remove_self_mentions
 from src.util.TensorBuilder import TensorBuilder
-from twitchio import Message
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 
@@ -20,7 +20,9 @@ class Pipeline:
     tokenizer: Tokenizer
     channel: Channel
 
-    def __init__(self, model: LanguageModel, tokenizer: Tokenizer, channel: Channel) -> None:
+    def __init__(
+        self, model: LanguageModel, tokenizer: Tokenizer, channel: Channel
+    ) -> None:
         self.model = model
         self.tokenizer = tokenizer
         self.channel = channel

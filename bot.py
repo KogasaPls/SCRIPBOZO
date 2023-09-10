@@ -78,8 +78,8 @@ class Bot(commands.Bot):
 
     async def ignore_channels(self):
         live_channels = await self.fetch_streams(
-            user_logins=self.offline_only_channels,
-            type="live")
+            user_logins=self.offline_only_channels, type="live"
+        )
 
         live_channel_names = [channel.user.name.lower() for channel in live_channels]
 
@@ -111,7 +111,8 @@ class Bot(commands.Bot):
         match command:
             case Command.HELP:
                 await message.channel.send(
-                    "Commands: !help, !restart, !sleep, !resume, !quit")
+                    "Commands: !help, !restart, !sleep, !resume, !quit"
+                )
             case Command.RESTART:
                 log.info("Restarting...")
                 await message.channel.send("NOOO")
@@ -136,32 +137,31 @@ class Bot(commands.Bot):
         return self.auth.get_token()
 
     def is_sender_privileged(self, message: Message) -> bool:
-        return message.author.name.lower() == "kogasapls" or message.author.is_mod or message.author.is_broadcaster
+        return (
+            message.author.name.lower() == "kogasapls"
+            or message.author.is_mod
+            or message.author.is_broadcaster
+        )
 
 
 if __name__ == "__main__":
     bot: Bot = Bot()
     bot.run()
 
-
     @routines.routine(minutes=5, wait_first=True)
     async def ignore_channels():
         await bot.ignore_channels()
 
-
     @bot.event()
     async def event_error(error, data):
-        traceback.print_exception(type(error),
-                                  error,
-                                  error.__traceback__,
-                                  file=sys.stderr)
-
+        traceback.print_exception(
+            type(error), error, error.__traceback__, file=sys.stderr
+        )
 
     @bot.event()
     async def event_stream_online(data):
         log.info(f"Stream online: {data}")
         await bot.event_stream_online(data)
-
 
     @bot.event()
     async def event_stream_offline(data):
