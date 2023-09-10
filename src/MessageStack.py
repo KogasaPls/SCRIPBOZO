@@ -72,6 +72,7 @@ class MessageStack(List[TokenWrapper]):
         for msg in reversed(self):
             # If we have enough tokens, delete the rest of the list.
             if is_full:
+                self.remove(msg)
                 del msg
                 continue
 
