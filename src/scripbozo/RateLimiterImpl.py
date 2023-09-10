@@ -1,6 +1,5 @@
 from aiolimiter import AsyncLimiter
-
-from src.interfaces.RateLimiter import RateLimiter
+from scripbozo.interfaces.RateLimiter import RateLimiter
 
 
 class FrequencyLimiter(RateLimiter):

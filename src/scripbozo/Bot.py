@@ -4,19 +4,18 @@ import sys
 import traceback
 from argparse import Namespace
 
+from scripbozo.Command import Command
+from scripbozo.CommandHandler import CommandHandler
+from scripbozo.GPT2Model import GPT2Model
+from scripbozo.GPT2Tokenizer import GPT2Tokenizer
+from scripbozo.MessageHandler import MessageHandler
+from scripbozo.MessageIgnorer import MessageIgnorer
+from scripbozo.TwitchAuth import TwitchAuth
+from scripbozo.util.CustomLogger import CustomLogger
+from scripbozo.util.EnvDefault import ArgParser
 from twitchio import Message
 from twitchio.ext import commands
 from twitchio.ext import routines
-
-from src.Command import Command
-from src.CommandHandler import CommandHandler
-from src.GPT2Model import GPT2Model
-from src.GPT2Tokenizer import GPT2Tokenizer
-from src.MessageHandler import MessageHandler
-from src.MessageIgnorer import MessageIgnorer
-from src.TwitchAuth import TwitchAuth
-from src.util.CustomLogger import CustomLogger
-from src.util.EnvDefault import ArgParser
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 
@@ -143,27 +142,25 @@ class Bot(commands.Bot):
             or message.author.is_broadcaster
         )
 
+    def run(self):
+        super().run()
 
-if __name__ == "__main__":
-    bot: Bot = Bot()
-    bot.run()
+        @routines.routine(minutes=5, wait_first=True)
+        async def ignore_channels():
+            await self.ignore_channels()
 
-    @routines.routine(minutes=5, wait_first=True)
-    async def ignore_channels():
-        await bot.ignore_channels()
+        @self.event()
+        async def event_error(error, data):
+            traceback.print_exception(
+                type(error), error, error.__traceback__, file=sys.stderr
+            )
 
-    @bot.event()
-    async def event_error(error, data):
-        traceback.print_exception(
-            type(error), error, error.__traceback__, file=sys.stderr
-        )
+        @self.event()
+        async def event_stream_online(data):
+            log.info(f"Stream online: {data}")
+            await self.event_stream_online(data)
 
-    @bot.event()
-    async def event_stream_online(data):
-        log.info(f"Stream online: {data}")
-        await bot.event_stream_online(data)
-
-    @bot.event()
-    async def event_stream_offline(data):
-        log.info(f"Stream offline: {data}")
-        await bot.event_stream_offline(data)
+        @self.event()
+        async def event_stream_offline(data):
+            log.info(f"Stream offline: {data}")
+            await self.event_stream_offline(data)

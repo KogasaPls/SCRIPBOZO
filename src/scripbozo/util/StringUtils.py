@@ -1,7 +1,7 @@
 import os
 import re
 
-from src import Config
+from scripbozo import Config
 
 
 def remove_self_mentions(text) -> str:

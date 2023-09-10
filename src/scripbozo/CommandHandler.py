@@ -1,5 +1,4 @@
-from src.Command import Command
-from twitchio import Channel
+from scripbozo.Command import Command
 from twitchio import Message
 
 

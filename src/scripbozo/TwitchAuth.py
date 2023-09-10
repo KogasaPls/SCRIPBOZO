@@ -7,10 +7,10 @@ from typing import Any
 
 import requests
 import ujson
+from scripbozo.util.CustomLogger import CustomLogger
 from typing_extensions import Self
 
-import src.Config as Config
-from src.util.CustomLogger import CustomLogger
+import src.scripbozo.Config as Config
 
 TWITCH_OAUTH_URL: str = "https://id.twitch.tv/oauth2/token"
 
@@ -55,7 +55,8 @@ class TwitchAuthData:
 
     def is_expired(self) -> bool:
         log.debug(
-            f"Refresh token expires at {datetime.fromtimestamp(self.get_expiration_time())}."
+            "Refresh token expires at"
+            f" {datetime.fromtimestamp(self.get_expiration_time())}."
         )
         return self.get_expiration_time() < ceil(datetime.now().timestamp())
 

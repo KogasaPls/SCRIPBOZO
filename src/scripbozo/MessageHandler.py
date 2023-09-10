@@ -1,14 +1,13 @@
 import logging
 
+from scripbozo.Channel import Channel
+from scripbozo.Channel import ChannelList
+from scripbozo.interfaces.LanguageModel import LanguageModel
+from scripbozo.interfaces.Tokenizer import Tokenizer
+from scripbozo.Pipeline import Pipeline
+from scripbozo.util.CustomLogger import CustomLogger
+from scripbozo.util.StringUtils import contains_self_mention
 from twitchio import Message
-
-from src.Channel import Channel
-from src.Channel import ChannelList
-from src.interfaces.LanguageModel import LanguageModel
-from src.interfaces.Tokenizer import Tokenizer
-from src.Pipeline import Pipeline
-from src.util.CustomLogger import CustomLogger
-from src.util.StringUtils import contains_self_mention
 
 
 class MessageHandler:

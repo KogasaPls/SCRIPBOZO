@@ -8,7 +8,9 @@ class EnvDefault(argparse.Action):
     """Allow argparse to use environment variables as defaults."""
 
     def __init__(self, envvar, required=True, default=None, **kwargs) -> None:
-        dotenv.load_dotenv()
+        current_path = os.getcwd()
+        dotenv.load_dotenv(dotenv_path=f"{current_path}/.env")
+
         default_or_env: str | None = default or os.environ[envvar]
         is_still_required: bool = required and not default_or_env
         super(EnvDefault, self).__init__(

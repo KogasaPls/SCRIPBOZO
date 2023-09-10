@@ -1,13 +1,12 @@
 from logging import Logger
 
+from scripbozo.interfaces.Tokenizer import Tokenizer
+from scripbozo.util.CustomLogger import CustomLogger
+from scripbozo.util.StringUtils import trim_text_to_max_length
 from torch import Tensor
 from transformers.models.gpt2.tokenization_gpt2 import (
     GPT2Tokenizer as BaseGPT2Tokenizer,
 )
-
-from src.interfaces.Tokenizer import Tokenizer
-from src.util.CustomLogger import CustomLogger
-from src.util.StringUtils import trim_text_to_max_length
 
 log: Logger = CustomLogger(__name__).get_logger()
 

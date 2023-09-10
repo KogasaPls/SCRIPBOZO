@@ -1,13 +1,13 @@
 from logging import Logger
 
 import torch
+from scripbozo.interfaces.LanguageModel import LanguageModel
+from scripbozo.util.CustomLogger import CustomLogger
+from scripbozo.util.TensorBuilder import TensorBuilder
 from torch import Tensor
 from transformers.models.gpt2.modeling_gpt2 import GPT2LMHeadModel as BaseModel
 
-import src.Config as Config
-from src.interfaces.LanguageModel import LanguageModel
-from src.util.CustomLogger import CustomLogger
-from src.util.TensorBuilder import TensorBuilder
+import src.scripbozo.Config as Config
 
 log: Logger = CustomLogger(__name__).get_logger()
 

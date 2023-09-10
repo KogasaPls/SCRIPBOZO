@@ -1,16 +1,16 @@
 import logging
 
+from scripbozo.Channel import Channel
+from scripbozo.interfaces.LanguageModel import LanguageModel
+from scripbozo.interfaces.Tokenizer import Tokenizer
+from scripbozo.OutputBuilder import OutputBuilder
+from scripbozo.util.CustomLogger import CustomLogger
+from scripbozo.util.StringUtils import remove_self_mentions
+from scripbozo.util.TensorBuilder import TensorBuilder
 from torch import Tensor
 from twitchio import Message
 
-import src.Config as Config
-from src.Channel import Channel
-from src.interfaces.LanguageModel import LanguageModel
-from src.interfaces.Tokenizer import Tokenizer
-from src.OutputBuilder import OutputBuilder
-from src.util.CustomLogger import CustomLogger
-from src.util.StringUtils import remove_self_mentions
-from src.util.TensorBuilder import TensorBuilder
+import src.scripbozo.Config as Config
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 

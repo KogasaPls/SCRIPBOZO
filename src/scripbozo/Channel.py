@@ -3,15 +3,15 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import List
 
+from scripbozo.interfaces.Tokenizer import Tokenizer
+from scripbozo.MessageStack import MessageStack
+from scripbozo.RateLimiterImpl import FrequencyLimiter
+from scripbozo.RateLimiterImpl import VolumeLimiter
+from scripbozo.util.CustomLogger import CustomLogger
 from torch import Tensor
 from twitchio import Message
 
-import src.Config as Config
-from src.interfaces.Tokenizer import Tokenizer
-from src.MessageStack import MessageStack
-from src.RateLimiterImpl import FrequencyLimiter
-from src.RateLimiterImpl import VolumeLimiter
-from src.util.CustomLogger import CustomLogger
+import src.scripbozo.Config as Config
 
 
 @dataclass

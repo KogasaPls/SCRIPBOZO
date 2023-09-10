@@ -4,6 +4,10 @@ version = "0.1.0"
 description = "A Twitch chatbot based on GPT2 trained on MOONMOON's chat logs"
 authors = ["Kogasa <kogasapls@gmail.com>"]
 readme = "README.md"
+packages = [{ include = "scripbozo", from = "src" }]
+
+[tool.poetry.scripts]
+run = "scripbozo.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.11"
