@@ -1,5 +1,3 @@
-import gc
-import logging
 from typing import List
 
 import torch
@@ -8,10 +6,9 @@ from twitchio import Message
 
 import src.Config as Config
 from src.interfaces.Tokenizer import Tokenizer
-from src.util.CustomLogger import CustomLogger
 from src.util.StringUtils import remove_self_mentions
 
-log: logging.Logger = CustomLogger(__name__).get_logger()
+max_tokens = Config.MODEL_MAX_TOKENS - Config.OUTPUT_MAX_TOKENS
 
 
 class WrapsMessage:
@@ -58,7 +55,7 @@ class TokenWrapper(WrapsMessage):
             self.tokenize(tokenizer)
 
 
-class MessageQueue(List[TokenWrapper]):
+class MessageStack(List[TokenWrapper]):
     def __init__(self) -> None:
         super().__init__()
 
@@ -70,18 +67,19 @@ class MessageQueue(List[TokenWrapper]):
         """Starting from the newest messages, tokenize if necessary and then
         add to the list to be returned."""
         num_tokens: int = 0
-        max_tokens = self.max_tokens_in_input()
+        is_full: bool = False
 
         for msg in reversed(self):
-            # If there's still room in the input, tokenize the message.
-            if num_tokens < max_tokens:
-                msg.tokenize_if_necessary(tokenizer)
-                num_tokens += msg.get_num_tokens()
-            # If the list is too big now, delete these tokens and any later ones.
-            if num_tokens >= max_tokens:
+            # If we have enough tokens, delete the rest of the list.
+            if is_full:
                 del msg
-        # Free up memory from deleted tokens/wrappers.
-        gc.collect()
+                continue
+
+            msg.tokenize_if_necessary(tokenizer)
+            num_tokens += msg.get_num_tokens()
+
+            if num_tokens >= max_tokens:
+                is_full = True
 
         tokens = torch.cat(self.get_tokens(), dim=1)
         return tokens
@@ -89,11 +87,6 @@ class MessageQueue(List[TokenWrapper]):
     def delete_tokens_from(self, idx: int) -> None:
         del reversed(self)[idx:]
 
-    def max_tokens_in_input(self) -> int:
-        return Config.MODEL_MAX_TOKENS - Config.OUTPUT_MAX_TOKENS
-
     def get_tokens(self) -> List[Tensor]:
         """Return a list of tokenized messages in chronological order (newest last)."""
-        return [msg.tokens for msg in self if msg.tokens is not None][
-            : self.max_tokens_in_input()
-        ]
+        return [msg.tokens for msg in self if msg.tokens is not None][:max_tokens]
