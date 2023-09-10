@@ -20,6 +20,8 @@ class Pipeline:
     tokenizer: Tokenizer
     channel: Channel
 
+    log: logging.Logger = CustomLogger(__name__).get_logger()
+
     def __init__(
         self, model: LanguageModel, tokenizer: Tokenizer, channel: Channel
     ) -> None:
@@ -28,12 +30,11 @@ class Pipeline:
         self.channel = channel
 
     def reply(self, message: Message) -> str | None:
-        self.channel.log(f"{message.author.name}: {message.content}")
+        self.log_message(message)
         assert message.content
 
         text_to_encode: str = remove_self_mentions(message.content)
         tokenized_message: Tensor = self.tokenizer.encode(text_to_encode)
-
         channel_history: Tensor = self.channel.get_tokens(self.tokenizer)
 
         input_tokens: Tensor = (
@@ -45,6 +46,11 @@ class Pipeline:
         )
 
         return self.generate(input_tokens)
+
+    def log_message(self, message: Message) -> None:
+        self.log.info(
+            f"(#{message.channel.name}) {message.author.name}: {message.content}"
+        )
 
     def generate(self, input_tokens: Tensor | None = None) -> str:
         return (

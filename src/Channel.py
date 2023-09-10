@@ -4,6 +4,7 @@ from dataclasses import field
 from typing import List
 
 from torch import Tensor
+from twitchio import Message
 
 import src.Config as Config
 from src.interfaces.Tokenizer import Tokenizer
@@ -11,9 +12,6 @@ from src.MessageQueue import MessageQueue
 from src.RateLimiterImpl import FrequencyLimiter
 from src.RateLimiterImpl import VolumeLimiter
 from src.util.CustomLogger import CustomLogger
-from twitchio import Message
-
-log: logging.Logger = CustomLogger(__name__).get_logger()
 
 
 @dataclass
@@ -27,6 +25,8 @@ class Channel:
         default_factory=lambda: VolumeLimiter(Config.RATE_LIMIT_VOLUME)
     )
 
+    log: logging.Logger = CustomLogger(__name__).get_logger()
+
     def __str__(self) -> str:
         return f"#{self.name}"
 
@@ -36,12 +36,6 @@ class Channel:
 
     def get_tokens(self, tokenizer: Tokenizer) -> Tensor:
         return self.messages.tokenize(tokenizer)
-
-    def log(self, message: str) -> None:
-        log.info(f"({self}) {message}")
-
-    def debug(self, message: str) -> None:
-        log.debug(f"({self}) {message}")
 
 
 class ChannelList(List[Channel]):
