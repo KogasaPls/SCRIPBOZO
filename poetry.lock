@@ -2170,4 +2170,4 @@ dev = ["black", "pylint", "reorder-python-imports"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "c97dcc9090f354629b4b4946b28b480503e399a1310a13d646548a1a7bb81821"
+content-hash = "345e4e06c237b124e7fc595fe199da23fa52f53d040562cf2d7e52c0841c2d3a"
