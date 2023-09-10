@@ -45,7 +45,6 @@ class GPT2Model(LanguageModel):
             top_p=Config.TOP_P,
             no_repeat_ngram_size=Config.NO_REPEAT_NGRAM_SIZE,
             repetition_penalty=Config.REPETITION_PENALTY,
-            length_penalty=Config.LENGTH_PENALTY,
             min_length=Config.MIN_LENGTH,
             eos_token_id=Config.NEWLINE_TOKEN_ID,
             do_sample=True,

@@ -9,3 +9,4 @@ class Command(Enum):
     RESUME = "resume"
     QUIT = "quit"
     CUM = "cum"
+    MEDS = "meds"

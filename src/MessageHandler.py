@@ -1,5 +1,7 @@
 import logging
 
+from twitchio import Message
+
 from src.Channel import Channel
 from src.Channel import ChannelList
 from src.interfaces.LanguageModel import LanguageModel
@@ -7,7 +9,6 @@ from src.interfaces.Tokenizer import Tokenizer
 from src.Pipeline import Pipeline
 from src.util.CustomLogger import CustomLogger
 from src.util.StringUtils import contains_self_mention
-from twitchio import Message
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 
@@ -38,13 +39,15 @@ class MessageHandler:
         return contains_self_mention(message.content)
 
     def ignore_channel(self, channel_name: str) -> None:
-        channel: Channel = self.channels.get_channel_if_exists(channel_name)
-        if channel:
-            self.ignored_channels.add_channel(channel)
+        channel: Channel = self.channels.get_channel(channel_name)
+        log.info(f"Ignoring channel {channel_name}")
+        self.ignored_channels.add_channel(channel)
 
     def unignore_channel(self, channel_name: str) -> None:
-        channel: Channel | None = self.ignored_channels.get_channel_if_exists(channel_name)
-        if channel:
+        channel: Channel | None = self.ignored_channels.get_channel_if_exists(
+            channel_name)
+        if channel and self.ignored_channels.contains(channel_name):
+            log.info(f"Unignoring channel {channel_name}")
             self.ignored_channels.remove_channel(channel)
 
     async def handle_message(self, message: Message) -> None:
@@ -62,7 +65,8 @@ class MessageHandler:
             return
 
         await channel.frequencyLimit.tick()
-        response: str | None = Pipeline(self.model, self.tokenizer, channel).reply(message)
+        response: str | None = Pipeline(self.model, self.tokenizer, channel).reply(
+            message)
 
         if response is not None:
             channel.log(f"Replying to {message.author.name}: {response}")
