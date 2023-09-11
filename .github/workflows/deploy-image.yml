@@ -13,6 +13,7 @@ env:
 jobs:
   push:
     runs-on: ubuntu-latest
+    environment: deploy
     permissions:
       packages: write
       contents: read
