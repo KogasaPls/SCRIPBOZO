@@ -2,9 +2,9 @@
 name: Deploy Image
 
 on:
-  push:
-    tags:
-      - v*
+  release:
+    types:
+      - published
 env:
   IMAGE_NAME: scripbozo
 
