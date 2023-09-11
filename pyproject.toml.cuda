@@ -11,7 +11,7 @@ run = "scripbozo.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-torch = { version = "*", source = "torch_rocm" }
+torch = { version = "*", source = "torch_cuda" }
 twitchio = "^2.5"
 transformers = "^4.24"
 datasets = "^2.7"
