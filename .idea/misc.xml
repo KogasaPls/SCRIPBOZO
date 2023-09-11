@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="Black">
-    <option name="pathToExecutable" value="/sbin/black" />
-    <option name="sdkUUID" value="f48b33e2-4a34-4f5d-8523-0b6fdcd60dbd" />
-  </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Poetry (SCRIPBOZO)" project-jdk-type="Python SDK" />
-</project>
