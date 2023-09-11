@@ -27,8 +27,9 @@ RUN apt-get install --no-install-recommends -y curl build-essential
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 WORKDIR $PYSETUP_PATH
-#COPY poetry.lock pyproject.toml ./
-COPY pyproject.toml poetry.lock README.md LICENSE ./
+COPY poetry.lock.cuda poetry.lock
+COPY pyproject.toml.cuda pyproject.toml
+COPY README.md LICENSE ./
 COPY ./src ./src
 
 RUN poetry install --only main

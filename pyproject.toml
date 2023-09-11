@@ -26,7 +26,7 @@ black = { version = "*", optional = true }
 reorder-python-imports = { version = "*", optional = true }
 pre-commit = { version = "^3.2", optional = true }
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pylint = "*"
 black = "*"
 reorder-python-imports = "*"
@@ -36,6 +36,17 @@ pre-commit = "*"
 name = "torch_rocm"
 url = "https://download.pytorch.org/whl/rocm5.4.2"
 priority = "explicit"
+
+[[tool.poetry.source]]
+name = "torch_cuda"
+url = "https://download.pytorch.org/whl/cu118"
+priority = "explicit"
+
+[[tool.poetry.source]]
+name = "torch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
+
 
 [tool.poetry.extras]
 dev = ["pylint", "black", "reorder-python-imports"]
