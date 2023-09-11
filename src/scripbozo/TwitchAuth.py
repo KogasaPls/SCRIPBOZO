@@ -1,4 +1,5 @@
 import logging
+import os
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import datetime
@@ -72,7 +73,10 @@ class TwitchAuth:
 
     def setup_refresh_token(self) -> None:
         try:
-            self.data = TwitchAuth.load_from_file()
+            if os.path.exists(Config.TWITCH_AUTH_JSON):
+                self.data = TwitchAuth.load_from_file()
+            else:
+                self.data = TwitchAuth.load_from_env()
         except Exception as e:
             log.exception(e)
             self.data = TwitchAuthData()
@@ -89,6 +93,16 @@ class TwitchAuth:
             if not data:
                 raise Exception("No Twitch auth data found in file.")
             return data
+
+    @staticmethod
+    def load_from_env() -> TwitchAuthData:
+        log.info(f"Loading auth data from environment variables.")
+        data: TwitchAuthData = TwitchAuthData()
+        data.data["auth_token"] = os.environ["TWITCH_AUTH_TOKEN"]
+        data.data["expires_in"] = os.environ["TWITCH_AUTH_EXPIRES_IN"]
+        data.data["refresh_token"] = os.environ["TWITCH_AUTH_REFRESH_TOKEN"]
+        data.data["creation_time"] = os.environ["TWITCH_AUTH_CREATION_TIME"]
+        return data
 
     def save_to_file(self) -> None:
         log.info(f"Saving new auth data to {Config.TWITCH_AUTH_JSON}")
