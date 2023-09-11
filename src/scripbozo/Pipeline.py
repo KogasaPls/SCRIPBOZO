@@ -1,5 +1,6 @@
 import logging
 
+import scripbozo.Config as Config
 from scripbozo.Channel import Channel
 from scripbozo.interfaces.LanguageModel import LanguageModel
 from scripbozo.interfaces.Tokenizer import Tokenizer
@@ -9,8 +10,6 @@ from scripbozo.util.StringUtils import remove_self_mentions
 from scripbozo.util.TensorBuilder import TensorBuilder
 from torch import Tensor
 from twitchio import Message
-
-import src.scripbozo.Config as Config
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 

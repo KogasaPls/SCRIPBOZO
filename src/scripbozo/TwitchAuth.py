@@ -6,11 +6,10 @@ from math import ceil
 from typing import Any
 
 import requests
+import scripbozo.Config as Config
 import ujson
 from scripbozo.util.CustomLogger import CustomLogger
 from typing_extensions import Self
-
-import src.scripbozo.Config as Config
 
 TWITCH_OAUTH_URL: str = "https://id.twitch.tv/oauth2/token"
 

@@ -5,7 +5,7 @@ from logging import Handler
 from logging import Logger
 from typing import List
 
-import src.scripbozo.Config as Config
+import scripbozo.Config as Config
 
 LOG_FORMAT: str = "[%(asctime)s] (%(levelname)s) %(name)s: %(message)s"
 DATE_FORMAT: str = "%H:%M:%S"

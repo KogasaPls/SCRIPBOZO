@@ -1,14 +1,13 @@
 import random
 from logging import Logger
 
+import scripbozo.Config as Config
 from scripbozo.Channel import Channel
 from scripbozo.interfaces.LanguageModel import LanguageModel
 from scripbozo.interfaces.Tokenizer import Tokenizer
 from scripbozo.util.CustomLogger import CustomLogger
 from torch import Tensor
 from typing_extensions import Self
-
-import src.scripbozo.Config as Config
 
 log: Logger = CustomLogger(__name__).get_logger()
 

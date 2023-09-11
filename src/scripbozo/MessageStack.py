@@ -1,12 +1,11 @@
 from typing import List
 
+import scripbozo.Config as Config
 import torch
 from scripbozo.interfaces.Tokenizer import Tokenizer
 from scripbozo.util.StringUtils import remove_self_mentions
 from torch import Tensor
 from twitchio import Message
-
-import src.scripbozo.Config as Config
 
 max_tokens = Config.MODEL_MAX_TOKENS - Config.OUTPUT_MAX_TOKENS
 

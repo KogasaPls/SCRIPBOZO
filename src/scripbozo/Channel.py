@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import List
 
+import scripbozo.Config as Config
 from scripbozo.interfaces.Tokenizer import Tokenizer
 from scripbozo.MessageStack import MessageStack
 from scripbozo.RateLimiterImpl import FrequencyLimiter
@@ -10,8 +11,6 @@ from scripbozo.RateLimiterImpl import VolumeLimiter
 from scripbozo.util.CustomLogger import CustomLogger
 from torch import Tensor
 from twitchio import Message
-
-import src.scripbozo.Config as Config
 
 
 @dataclass
