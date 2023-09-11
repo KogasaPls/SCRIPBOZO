@@ -14,7 +14,6 @@ ENV PYTHONFAULTHANDLER=1 \
     PYSETUP_PATH="/opt/pysetup" \
     VENV_PATH="/opt/pysetup/.venv"
 
-# prepend poetry and venv to path
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
 RUN apt-get update
@@ -23,7 +22,6 @@ FROM base as builder
 
 RUN apt-get install --no-install-recommends -y curl build-essential
 
-# install poetry - respects $POETRY_VERSION & $POETRY_HOME
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 WORKDIR $PYSETUP_PATH
