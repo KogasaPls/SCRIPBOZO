@@ -1,13 +1,10 @@
 from typing import List
 
-import scripbozo.Config as Config
 import torch
 from scripbozo.interfaces.Tokenizer import Tokenizer
 from scripbozo.util.StringUtils import remove_self_mentions
 from torch import Tensor
 from twitchio import Message
-
-max_tokens = Config.MODEL_MAX_TOKENS - Config.OUTPUT_MAX_TOKENS
 
 
 class WrapsMessage:
@@ -55,8 +52,11 @@ class TokenWrapper(WrapsMessage):
 
 
 class MessageStack(List[TokenWrapper]):
-    def __init__(self) -> None:
+    _max_tokens: int
+
+    def __init__(self, max_tokens: int) -> None:
         super().__init__()
+        self._max_tokens = max_tokens
 
     async def add_message(self, message: Message) -> None:
         token_wrapper: TokenWrapper = TokenWrapper(message)
@@ -67,6 +67,7 @@ class MessageStack(List[TokenWrapper]):
         add to the list to be returned."""
         num_tokens: int = 0
         is_full: bool = False
+        max_tokens: int = self._max_tokens
 
         for msg in reversed(self):
             # If we have enough tokens, delete the rest of the list.
@@ -89,4 +90,6 @@ class MessageStack(List[TokenWrapper]):
 
     def get_tokens(self) -> List[Tensor]:
         """Return a list of tokenized messages in chronological order (newest last)."""
-        return [msg.tokens for msg in self if msg.tokens is not None][:max_tokens]
+        return [msg.tokens for msg in self if msg.tokens is not None][
+            : self._max_tokens
+        ]

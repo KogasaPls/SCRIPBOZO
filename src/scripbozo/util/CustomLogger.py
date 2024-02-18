@@ -5,8 +5,6 @@ from logging import Handler
 from logging import Logger
 from typing import List
 
-import scripbozo.Config as Config
-
 LOG_FORMAT: str = "[%(asctime)s] (%(levelname)s) %(name)s: %(message)s"
 DATE_FORMAT: str = "%H:%M:%S"
 
@@ -14,10 +12,14 @@ DATE_FORMAT: str = "%H:%M:%S"
 class CustomLogger:
     name: str
     level: str
+    log_file: str | None
 
-    def __init__(self, name: str, level: str = Config.DEFAULT_LOG_LEVEL) -> None:
+    def __init__(
+        self, name: str, level: str = "INFO", log_file: str | None = None
+    ) -> None:
         self.name = name
         self.level = level
+        self.log_file = log_file
         self.setup(level)
 
     def setup(self, level: str) -> None:
@@ -47,11 +49,10 @@ class CustomLogger:
         for handler in handlers:
             logging.getLogger(self.name).addHandler(handler)
 
-    @staticmethod
-    def make_handlers() -> list[Handler]:
+    def make_handlers(self) -> list[Handler]:
         handlers: List[Handler] = []
-        if Config.LOG_FILE:
-            handlers.append(CustomLogger.make_file_handler(Config.LOG_FILE))
+        if self.log_file:
+            handlers.append(CustomLogger.make_file_handler(self.log_file))
         handlers.append(CustomLogger.make_stdout_handler())
         return handlers
 

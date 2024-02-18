@@ -1,7 +1,9 @@
 import logging
+from typing import Dict
+from typing import Set
 
 from scripbozo.Channel import Channel
-from scripbozo.Channel import ChannelList
+from scripbozo.Config import Config
 from scripbozo.interfaces.LanguageModel import LanguageModel
 from scripbozo.interfaces.Tokenizer import Tokenizer
 from scripbozo.Pipeline import Pipeline
@@ -16,13 +18,17 @@ class MessageHandler:
     then sends a reply if one is generated.
     """
 
+    _config: Config
     model: LanguageModel
     tokenizer: Tokenizer
-    channels: ChannelList = ChannelList()
-    ignored_channels: ChannelList = ChannelList()
+    channels: Dict[str, Channel] = {}
+    ignored_channels: Set[str] = set()
     log: logging.Logger = CustomLogger(__name__).get_logger()
 
-    def __init__(self, model: LanguageModel, tokenizer: Tokenizer) -> None:
+    def __init__(
+        self, config: Config, model: LanguageModel, tokenizer: Tokenizer
+    ) -> None:
+        self._config = config
         self.model: LanguageModel = model
         self.tokenizer: Tokenizer = tokenizer
 
@@ -30,31 +36,33 @@ class MessageHandler:
         if not message.content:
             self.log.debug("Message has no content, ignoring.")
             return False
-        if self.ignored_channels.contains(message.channel.name):
+        if message.channel.name in self.ignored_channels:
             self.log.debug("Channel is ignored, ignoring message.")
             return False
 
         return contains_self_mention(message.content)
 
     def ignore_channel(self, channel_name: str) -> None:
-        channel: Channel = self.channels.get_channel(channel_name)
         self.log.info(f"Ignoring channel {channel_name}")
-        self.ignored_channels.add_channel(channel)
+        self.ignored_channels.add(channel_name)
 
     def unignore_channel(self, channel_name: str) -> None:
-        channel: Channel | None = self.ignored_channels.get_channel_if_exists(
-            channel_name
-        )
-        if channel and self.ignored_channels.contains(channel_name):
+        if channel_name in self.ignored_channels:
             self.log.info(f"Unignoring channel {channel_name}")
-            self.ignored_channels.remove_channel(channel)
+            self.ignored_channels.remove(channel_name)
+
+    def get_channel(self, channel_name: str):
+        if channel_name not in self.channels:
+            self.channels[channel_name] = Channel(self._config, channel_name)
+
+        return self.channels[channel_name]
 
     async def handle_message(self, message: Message) -> None:
         self.log.debug(
             f"(#{message.channel.name}) {message.author.name}: {message.content}"
         )
 
-        channel: Channel = self.channels.get_channel(message.channel.name)
+        channel: Channel = self.get_channel(message.channel.name)
         await channel.add_message(message)
 
         if self.should_reply(message):
@@ -66,9 +74,9 @@ class MessageHandler:
             return
 
         await channel.frequencyLimit.tick()
-        response: str | None = Pipeline(self.model, self.tokenizer, channel).reply(
-            message
-        )
+        response: str | None = Pipeline(
+            self._config, self.model, self.tokenizer, channel
+        ).reply(message)
 
         if response is not None:
             self.log.info(

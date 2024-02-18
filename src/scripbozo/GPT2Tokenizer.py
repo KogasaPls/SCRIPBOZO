@@ -2,7 +2,6 @@ from logging import Logger
 
 from scripbozo.interfaces.Tokenizer import Tokenizer
 from scripbozo.util.CustomLogger import CustomLogger
-from scripbozo.util.StringUtils import trim_text_to_max_length
 from torch import Tensor
 from transformers.models.gpt2.tokenization_gpt2 import (
     GPT2Tokenizer as BaseGPT2Tokenizer,
@@ -20,7 +19,6 @@ class GPT2Tokenizer(Tokenizer):
 
     def encode(self, message: str) -> Tensor:
         log.debug(f"encode: {message}")
-        message = trim_text_to_max_length(message)
         encoded: list[int] = self.wrappedTokenizer.encode(
             message + "\n", return_tensors="pt", truncation=True
         )

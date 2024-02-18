@@ -1,8 +1,8 @@
 from logging import Logger
 
-import scripbozo.Config as Config
 import torch
 from scripbozo.interfaces.LanguageModel import LanguageModel
+from scripbozo.ModelConfig import ModelConfig
 from scripbozo.util.CustomLogger import CustomLogger
 from scripbozo.util.TensorBuilder import TensorBuilder
 from torch import Tensor
@@ -11,25 +11,47 @@ from transformers.models.gpt2.modeling_gpt2 import GPT2LMHeadModel as BaseModel
 log: Logger = CustomLogger(__name__).get_logger()
 
 
-def get_device_from_config() -> torch.device:
-    if (Config.DEVICE == "cuda:0") and not torch.cuda.is_available():
-        return torch.device("cpu")
-    return torch.device(Config.DEVICE)
-
-
 class GPT2Model(LanguageModel):
+    _config: ModelConfig
     wrappedModel: BaseModel
-    device: torch.device
-    maxLength: int = Config.MODEL_MAX_TOKENS
-    maxOutputLength: int = Config.OUTPUT_MAX_TOKENS
-    assert maxOutputLength < maxLength
+    newline_token_id: int
 
-    def __init__(self) -> None:
+    def __init__(self, config: ModelConfig) -> None:
         super().__init__()
-        self.device = get_device_from_config()
-        self.wrappedModel = BaseModel.from_pretrained(Config.MODEL_PATH).to(
-            Config.DEVICE
+        self._config = config
+        self.wrappedModel = BaseModel.from_pretrained(self._config.path()).to(
+            self.device()
         )
+
+    def device(self) -> str:
+        return self._config.cuda_device()
+
+    def model_max_tokens(self) -> int:
+        return self._config.model_max_tokens()
+
+    def output_max_tokens(self) -> int:
+        return self._config.output_max_tokens()
+
+    def temperature(self) -> float:
+        return self._config.generation_temperature()
+
+    def top_k(self) -> int:
+        return self._config.generation_top_k()
+
+    def top_p(self) -> float:
+        return self._config.generation_top_p()
+
+    def no_repeat_ngram_size(self) -> int:
+        return self._config.generation_no_repeat_ngram_size()
+
+    def repetition_penalty(self) -> float:
+        return self._config.generation_repetition_penalty()
+
+    def min_length(self) -> int:
+        return self._config.generation_min_length()
+
+    def max_input_length(self) -> int:
+        return self.model_max_tokens() - self.output_max_tokens()
 
     def generate(self, _tokens: Tensor) -> Tensor:
         log.debug(f"generate({_tokens})")
@@ -38,16 +60,16 @@ class GPT2Model(LanguageModel):
         attention_mask: Tensor = torch.ones_like(tokens)
 
         generated: Tensor = self.wrappedModel.generate(
-            tokens.to(Config.DEVICE),
-            attention_mask=attention_mask.to(Config.DEVICE),
-            max_new_tokens=self.maxOutputLength,
-            temperature=Config.TEMPERATURE,
-            top_k=Config.TOP_K,
-            top_p=Config.TOP_P,
-            no_repeat_ngram_size=Config.NO_REPEAT_NGRAM_SIZE,
-            repetition_penalty=Config.REPETITION_PENALTY,
-            min_length=Config.MIN_LENGTH,
-            eos_token_id=Config.NEWLINE_TOKEN_ID,
+            tokens.to(self.device()),
+            attention_mask=attention_mask.to(self.device()),
+            max_new_tokens=self.output_max_tokens(),
+            temperature=self.temperature(),
+            top_k=self.top_k(),
+            top_p=self.top_p(),
+            no_repeat_ngram_size=self.no_repeat_ngram_size(),
+            repetition_penalty=self.repetition_penalty(),
+            min_length=self.min_length(),
+            eos_token_id=self.newline_token_id,
             do_sample=True,
             num_return_sequences=1,
         )[0]
@@ -55,11 +77,8 @@ class GPT2Model(LanguageModel):
         # strip input tokens from output
         return generated[tokens.shape[1] :]
 
-    def get_max_input_length(self) -> int:
-        return self.maxLength - self.maxOutputLength
-
     def trim_tokens_to_max_input_length(self, tokens: Tensor) -> Tensor:
-        max_input_length: int = self.maxLength - self.maxOutputLength
+        max_input_length: int = self.max_input_length()
         if tokens.shape[1] > max_input_length:
             log.debug(
                 f"trimming tokens to max size: {tokens.shape[1]} > {max_input_length}"

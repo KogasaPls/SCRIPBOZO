@@ -6,6 +6,7 @@ from argparse import Namespace
 
 from scripbozo.Command import Command
 from scripbozo.CommandHandler import CommandHandler
+from scripbozo.Config import Config
 from scripbozo.GPT2Model import GPT2Model
 from scripbozo.GPT2Tokenizer import GPT2Tokenizer
 from scripbozo.MessageHandler import MessageHandler
@@ -22,6 +23,7 @@ log: logging.Logger = CustomLogger(__name__).get_logger()
 
 def get_args_from_env() -> argparse.Namespace:
     arg_parser: ArgParser = ArgParser()
+    arg_parser.add_argument("--config", envvar="CONFIG", default="config.toml")
     arg_parser.add_argument("--nick", envvar="NICK")
     arg_parser.add_argument("--client_id", envvar="CLIENT_ID")
     arg_parser.add_argument("--client_secret", envvar="CLIENT_SECRET")
@@ -29,24 +31,22 @@ def get_args_from_env() -> argparse.Namespace:
     return arg_parser.parse_args()
 
 
-def get_new_message_handler() -> MessageHandler:
-    model: GPT2Model = GPT2Model()
-    tokenizer: GPT2Tokenizer = GPT2Tokenizer()
-    return MessageHandler(model, tokenizer)
-
-
 class Bot(commands.Bot):
-    args: Namespace = get_args_from_env()
+    _config: Config
     offline_only_channels: list[str]
     message_handler: MessageHandler
-    auth: TwitchAuth = TwitchAuth(
-        client_id=args.client_id,
-        client_secret=args.client_secret,
-    )
+    args: Namespace = get_args_from_env()
+    auth: TwitchAuth
 
     def __init__(self) -> None:
+        self._config = Config.from_file(self.args.config)
         self.offline_only_channels = ["moonmoon", "kogasapls"]
-        self.message_handler = get_new_message_handler()
+        self.message_handler = self.create_message_handler()
+        self.auth = TwitchAuth(
+            self._config,
+            client_id=self.args.client_id,
+            client_secret=self.args.client_secret,
+        )
         super().__init__(
             client_secret=self.args.client_secret,
             client_id=self.args.client_id,
@@ -55,6 +55,12 @@ class Bot(commands.Bot):
             token=self.auth.get_token(),
             prefix="!",
         )
+
+    def create_message_handler(self) -> MessageHandler:
+        model: GPT2Model = GPT2Model(self._config.model())
+        tokenizer: GPT2Tokenizer = GPT2Tokenizer()
+        model.newline_token_id = tokenizer.wrappedTokenizer.encode("\n")
+        return MessageHandler(self._config, model, tokenizer)
 
     async def event_stream_online(self, data) -> None:
         log.info(f"Stream online: {data}")
@@ -115,7 +121,7 @@ class Bot(commands.Bot):
             case Command.RESTART:
                 log.info("Restarting...")
                 await message.channel.send("NOOO")
-                self.message_handler = get_new_message_handler()
+                self.message_handler = self.create_message_handler()
             case Command.SLEEP:
                 self.message_handler.ignore_channel(message.channel.name)
                 await message.channel.send("Bedge")

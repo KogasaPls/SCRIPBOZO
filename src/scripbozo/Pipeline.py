@@ -1,7 +1,7 @@
 import logging
 
-import scripbozo.Config as Config
 from scripbozo.Channel import Channel
+from scripbozo.Config import Config
 from scripbozo.interfaces.LanguageModel import LanguageModel
 from scripbozo.interfaces.Tokenizer import Tokenizer
 from scripbozo.OutputBuilder import OutputBuilder
@@ -15,6 +15,7 @@ log: logging.Logger = CustomLogger(__name__).get_logger()
 
 
 class Pipeline:
+    _config: Config
     model: LanguageModel
     tokenizer: Tokenizer
     channel: Channel
@@ -22,8 +23,13 @@ class Pipeline:
     log: logging.Logger = CustomLogger(__name__).get_logger()
 
     def __init__(
-        self, model: LanguageModel, tokenizer: Tokenizer, channel: Channel
+        self,
+        config: Config,
+        model: LanguageModel,
+        tokenizer: Tokenizer,
+        channel: Channel,
     ) -> None:
+        self._config = config
         self.model = model
         self.tokenizer = tokenizer
         self.channel = channel
@@ -32,15 +38,19 @@ class Pipeline:
         self.log_message(message)
         assert message.content
 
-        text_to_encode: str = remove_self_mentions(message.content)
+        text_to_encode: str = remove_self_mentions(message.content)[
+            : self._config.bot_input_message_max_chars()
+        ].strip()
         tokenized_message: Tensor = self.tokenizer.encode(text_to_encode)
         channel_history: Tensor = self.channel.get_tokens(self.tokenizer)
 
         input_tokens: Tensor = (
             TensorBuilder()
             .append(channel_history)
-            .append_n_times(tokenized_message, Config.PROMPT_DUPLICATION_FACTOR)
-            .left_trim_to_size(Config.MODEL_MAX_TOKENS)
+            .append_n_times(
+                tokenized_message, self._config.generation_prompt_duplication_factor()
+            )
+            .left_trim_to_size(self._config.model().model_max_tokens())
             .build()
         )
 
@@ -53,7 +63,7 @@ class Pipeline:
 
     def generate(self, input_tokens: Tensor | None = None) -> str:
         return (
-            OutputBuilder()
+            OutputBuilder(self._config)
             .with_model(self.model)
             .with_tokenizer(self.tokenizer)
             .with_input(input_tokens)

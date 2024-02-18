@@ -7,8 +7,8 @@ from math import ceil
 from typing import Any
 
 import requests
-import scripbozo.Config as Config
 import ujson
+from scripbozo.Config import Config
 from scripbozo.util.CustomLogger import CustomLogger
 from typing_extensions import Self
 
@@ -62,21 +62,24 @@ class TwitchAuthData:
 
 
 class TwitchAuth:
+    _config: Config
     client_id: str
     client_secret: str
-    data: TwitchAuthData = TwitchAuthData()
+    data: TwitchAuthData
 
-    def __init__(self, client_id: str, client_secret: str) -> None:
+    def __init__(self, config: Config, client_id: str, client_secret: str) -> None:
+        self._config = config
         self.client_id = client_id
         self.client_secret = client_secret
         self.setup_refresh_token()
 
     def setup_refresh_token(self) -> None:
         try:
-            if os.path.exists(Config.TWITCH_AUTH_JSON):
-                self.data = TwitchAuth.load_from_file()
+            file_path: str = self._config.twitch_auth_json()
+            if os.path.exists(file_path):
+                self.data = self.__load_from_file(file_path)
             else:
-                self.data = TwitchAuth.load_from_env()
+                self.data = self.__load_from_env()
         except Exception as e:
             log.exception(e)
             self.data = TwitchAuthData()
@@ -85,9 +88,9 @@ class TwitchAuth:
             self.refresh_token()
 
     @staticmethod
-    def load_from_file() -> TwitchAuthData:
-        log.info(f"Loading auth data from {Config.TWITCH_AUTH_JSON}")
-        with open(Config.TWITCH_AUTH_JSON, "r") as f:
+    def __load_from_file(file_path: str) -> TwitchAuthData:
+        log.info(f"Loading auth data from {file_path}")
+        with open(file_path, "r") as f:
             file: str = f.read()
             data: TwitchAuthData = TwitchAuthData().from_json(file)
             if not data:
@@ -95,7 +98,7 @@ class TwitchAuth:
             return data
 
     @staticmethod
-    def load_from_env() -> TwitchAuthData:
+    def __load_from_env() -> TwitchAuthData:
         log.info(f"Loading auth data from environment variables.")
         data: TwitchAuthData = TwitchAuthData()
         data.data["auth_token"] = os.environ["TWITCH_AUTH_TOKEN"]
@@ -105,8 +108,9 @@ class TwitchAuth:
         return data
 
     def save_to_file(self) -> None:
-        log.info(f"Saving new auth data to {Config.TWITCH_AUTH_JSON}")
-        self.data.save_to_file(Config.TWITCH_AUTH_JSON)
+        file_path = self._config.twitch_auth_json()
+        log.info(f"Saving new auth data to {file_path}")
+        self.data.save_to_file(file_path)
 
     def request_new_token_using_refresh(self) -> Any:
         log.info(f"Requesting new token using refresh token.")
