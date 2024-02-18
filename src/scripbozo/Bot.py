@@ -10,7 +10,6 @@ from scripbozo.Config import Config
 from scripbozo.GPT2Model import GPT2Model
 from scripbozo.GPT2Tokenizer import GPT2Tokenizer
 from scripbozo.MessageHandler import MessageHandler
-from scripbozo.MessageIgnorer import MessageIgnorer
 from scripbozo.TwitchAuth import TwitchAuth
 from scripbozo.util.CustomLogger import CustomLogger
 from scripbozo.util.EnvDefault import ArgParser
@@ -97,7 +96,7 @@ class Bot(commands.Bot):
                 self.message_handler.unignore_channel(channel)
 
     async def event_message(self, message) -> None:
-        if MessageIgnorer(message).should_ignore():
+        if self.should_ignore_message(message):
             return
 
         command: Command = CommandHandler.try_parse_command(message)
@@ -146,6 +145,15 @@ class Bot(commands.Bot):
             message.author.name.lower() == "kogasapls"
             or message.author.is_mod
             or message.author.is_broadcaster
+        )
+
+    def should_ignore_message(self, message: Message) -> bool:
+        return (
+            message.echo
+            or (not message.content)
+            or (message.author.name.lower() == self.nick.lower())
+            or (message.author.name in self._config.users_bots())
+            or (message.author.name in self._config.users_ignored())
         )
 
     def run(self):

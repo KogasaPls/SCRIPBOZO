@@ -3,6 +3,7 @@ from os import PathLike
 from pathlib import Path
 from typing import Any
 from typing import Dict
+from typing import List
 
 from scripbozo.ChannelConfig import ChannelConfig
 from scripbozo.ModelConfig import ModelConfig
@@ -69,3 +70,15 @@ class Config:
 
     def generation_prompt_duplication_factor(self) -> int:
         return self.__generation().get("prompt_duplication_factor", 3)
+
+    def users(self) -> Dict[str, Dict[str, Any]]:
+        return self.__get_or_add_section("Users")
+
+    def users_bots(self) -> Dict[str, List[str]]:
+        return self.users().get("Bots", [])
+
+    def users_ignored(self) -> Dict[str, List[str]]:
+        return self.users().get("Ignored", [])
+
+    def users_privileged(self) -> Dict[str, List[str]]:
+        return self.users().get("Privileged", [])

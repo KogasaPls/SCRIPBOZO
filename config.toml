@@ -19,3 +19,22 @@ output_max_Length = 255
 
 [Channels.moonmoon]
 offline_only = true
+
+[Users]
+Bots = [
+    "nightbot",
+    "moobot",
+    "streamlabs",
+    "streamelements",
+    "autoraver",
+    "poopthefirst",
+    "markov_chain_bot",
+    "sumbot",
+    "scripbozo"
+]
+Ignored = [
+    "ruinsofmaya"
+]
+Privileged = [
+    "kogasapls"
+]
