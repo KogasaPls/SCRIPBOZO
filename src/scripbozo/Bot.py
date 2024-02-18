@@ -80,7 +80,7 @@ class Bot(commands.Bot):
         channels_to_join = self.args.initial_channels.split(",")
         await self.join_channels(channels_to_join)
 
-    async def ignore_channels(self):
+    async def ignore_channels(self) -> None:
         live_channels = await self.fetch_streams(
             user_logins=self.offline_only_channels, type="live"
         )
@@ -142,9 +142,9 @@ class Bot(commands.Bot):
 
     def is_sender_privileged(self, message: Message) -> bool:
         return (
-            message.author.name.lower() == "kogasapls"
-            or message.author.is_mod
+            message.author.is_mod
             or message.author.is_broadcaster
+            or message.author.name in self._config.users_privileged()
         )
 
     def should_ignore_message(self, message: Message) -> bool:
