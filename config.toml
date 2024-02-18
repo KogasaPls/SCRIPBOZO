@@ -14,7 +14,6 @@ min_length = 2
 auth_json = "twitch_auth.json"
 
 [Bot]
-client_timeout = 10
 max_retries_for_reply = 50
 output_max_Length = 255
 

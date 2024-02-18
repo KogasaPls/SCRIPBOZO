@@ -30,9 +30,6 @@ class Config:
             self._config[section_name] = {}
         return self._config[section_name]
 
-    def __logging(self) -> Dict[str, Any]:
-        return self.__get_or_add_section("Logging")
-
     def __twitch(self) -> Dict[str, Any]:
         return self.__get_or_add_section("Twitch")
 
@@ -50,9 +47,6 @@ class Config:
 
     def bot_input_message_max_chars(self) -> int:
         return self.__bot().get("input_message_max_chars", 200)
-
-    def bot_client_timeout(self) -> int:
-        return self.__bot().get("client_timeout", 10)
 
     def bot_max_retries_for_reply(self) -> int:
         return self.__bot().get("max_retries_for_reply", 50)
