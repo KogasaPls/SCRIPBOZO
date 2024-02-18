@@ -1,0 +1,14 @@
+[Model]
+model_path = 'model'
+cuda_device = "cuda:0"
+model_max_tokens = 512
+output_max_tokens = 64
+temperature = 0.6
+top_k = 50
+top_p = 0.92
+no_repeat_ngram_size = 6
+repetition_penalty = 1.6
+min_length = 2
+
+[Channels.moonmoon]
+offline_only = true
