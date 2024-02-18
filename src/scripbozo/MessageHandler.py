@@ -36,11 +36,24 @@ class MessageHandler:
         if not message.content:
             self.log.debug("Message has no content, ignoring.")
             return False
+
         if message.channel.name in self.ignored_channels:
-            self.log.debug("Channel is ignored, ignoring message.")
+            self.log.info("Channel is ignored, ignoring message.")
             return False
 
-        return contains_self_mention(message.content)
+        if not contains_self_mention(message.content):
+            return False
+
+        channel: Channel = self.get_channel(message.channel.name)
+        if channel.is_offline_only() and channel.is_online:
+            self.log.info("Channel is online, ignoring message.")
+            return False
+
+        if channel.frequencyLimit.is_rate_limited():
+            self.log.info("Rate limited, ignoring message.")
+            return False
+
+        return True
 
     def ignore_channel(self, channel_name: str) -> None:
         self.log.info(f"Ignoring channel {channel_name}")
@@ -51,17 +64,13 @@ class MessageHandler:
             self.log.info(f"Unignoring channel {channel_name}")
             self.ignored_channels.remove(channel_name)
 
-    def get_channel(self, channel_name: str):
+    def get_channel(self, channel_name: str) -> Channel:
         if channel_name not in self.channels:
             self.channels[channel_name] = Channel(self._config, channel_name)
 
         return self.channels[channel_name]
 
     async def handle_message(self, message: Message) -> None:
-        self.log.debug(
-            f"(#{message.channel.name}) {message.author.name}: {message.content}"
-        )
-
         channel: Channel = self.get_channel(message.channel.name)
         await channel.add_message(message)
 
@@ -69,11 +78,6 @@ class MessageHandler:
             await self.handle_reply(message, channel)
 
     async def handle_reply(self, message: Message, channel: Channel) -> None:
-        if channel.frequencyLimit.is_rate_limited():
-            self.log.info(f"(#{message.channel}) Rate limited, ignoring message.")
-            return
-
-        await channel.frequencyLimit.tick()
         response: str | None = Pipeline(
             self._config, self.model, self.tokenizer, channel
         ).reply(message)
@@ -83,5 +87,8 @@ class MessageHandler:
                 f"(#{message.channel.name}) Replying to {message.author.name}:"
                 f" {response}"
             )
-            await message.channel.send(response)
+
+            await channel.frequencyLimit.tick()
             channel.volumeLimit.tick()
+
+            await message.channel.send(response)

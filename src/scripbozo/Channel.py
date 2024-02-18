@@ -19,6 +19,7 @@ class Channel:
     volumeLimit: VolumeLimiter
     messages: MessageStack
     log: logging.Logger = CustomLogger(__name__).get_logger()
+    is_online: bool = False
 
     def __init__(self, config: Config, channel_name: str):
         self._config = config.channel(channel_name)
@@ -36,3 +37,6 @@ class Channel:
 
     def get_tokens(self, tokenizer: Tokenizer) -> Tensor:
         return self.messages.tokenize(tokenizer)
+
+    def is_offline_only(self) -> bool:
+        return self._config.offline_only()

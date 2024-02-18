@@ -32,20 +32,30 @@ def get_args_from_env() -> argparse.Namespace:
 
 class Bot(commands.Bot):
     _config: Config
-    offline_only_channels: list[str]
     message_handler: MessageHandler
-    args: Namespace = get_args_from_env()
     auth: TwitchAuth
+    _ignored_users: set[str] = set()
+    _privileged_users: set[str] = set()
+    args: Namespace = get_args_from_env()
 
     def __init__(self) -> None:
         self._config = Config.from_file(self.args.config)
-        self.offline_only_channels = ["moonmoon", "kogasapls"]
         self.message_handler = self.create_message_handler()
         self.auth = TwitchAuth(
             self._config,
             client_id=self.args.client_id,
             client_secret=self.args.client_secret,
         )
+
+        for user in self._config.users_ignored():
+            self._ignored_users.add(user.lower())
+
+        for user in self._config.users_bots():
+            self._ignored_users.add(user.lower())
+
+        for user in self._config.users_privileged():
+            self._privileged_users.add(user.lower())
+
         super().__init__(
             client_secret=self.args.client_secret,
             client_id=self.args.client_id,
@@ -53,7 +63,7 @@ class Bot(commands.Bot):
             initial_channels=[],  # self.args.initial_channels.split(","),
             token=self.auth.get_token(),
             prefix="!",
-        )
+        ),
 
     def create_message_handler(self) -> MessageHandler:
         model: GPT2Model = GPT2Model(self._config.model())
@@ -63,37 +73,33 @@ class Bot(commands.Bot):
 
     async def event_stream_online(self, data) -> None:
         log.info(f"Stream online: {data}")
-        channel: str = data["broadcaster"].lower()
-        if channel in self.offline_only_channels:
-            self.message_handler.ignore_channel(channel)
+        channel_name: str = data["broadcaster"].lower()
+        self.message_handler.get_channel(channel_name).is_online = True
 
     async def event_stream_offline(self, data) -> None:
         log.info(f"Stream offline: {data}")
         channel = data["broadcaster"].lower()
-        if channel in self.offline_only_channels:
-            self.message_handler.unignore_channel(channel)
+        self.message_handler.get_channel(channel).is_online = False
 
     async def event_ready(self) -> None:
         log.info(f"Logged in as {self.nick}")
-        await self.ignore_channels()
+        await self.update_live_channels()
 
         channels_to_join = self.args.initial_channels.split(",")
         await self.join_channels(channels_to_join)
 
-    async def ignore_channels(self) -> None:
+    async def update_live_channels(self) -> None:
         live_channels = await self.fetch_streams(
-            user_logins=self.offline_only_channels, type="live"
+            user_logins=[key for key in self._config.channels().keys()], type="live"
         )
 
         live_channel_names = [channel.user.name.lower() for channel in live_channels]
 
-        for channel in self.offline_only_channels:
-            if channel in live_channel_names:
-                log.info(f"Channel {channel} is online")
-                self.message_handler.ignore_channel(channel)
+        for channel_name in self._config.channels().keys():
+            if channel_name in live_channel_names:
+                self.message_handler.get_channel(channel_name).is_online = True
             else:
-                log.info(f"Channel {channel} is offline")
-                self.message_handler.unignore_channel(channel)
+                self.message_handler.get_channel(channel_name).is_online = False
 
     async def event_message(self, message) -> None:
         if self.should_ignore_message(message):
@@ -151,17 +157,15 @@ class Bot(commands.Bot):
         return (
             message.echo
             or (not message.content)
-            or (message.author.name.lower() == self.nick.lower())
-            or (message.author.name in self._config.users_bots())
-            or (message.author.name in self._config.users_ignored())
+            or (message.author.name.lower() in self._ignored_users)
         )
 
-    def run(self):
+    def run(self) -> None:
         super().run()
 
         @routines.routine(minutes=5, wait_first=True)
         async def ignore_channels():
-            await self.ignore_channels()
+            await self.update_live_channels()
 
         @self.event()
         async def event_error(error, data):

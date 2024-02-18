@@ -20,6 +20,9 @@ output_max_Length = 255
 [Channels.moonmoon]
 offline_only = true
 
+[Channels.kogasapls]
+offline_only = true
+
 [Users]
 Bots = [
     "nightbot",
