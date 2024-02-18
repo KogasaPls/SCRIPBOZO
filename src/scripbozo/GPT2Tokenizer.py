@@ -21,11 +21,11 @@ class GPT2Tokenizer(Tokenizer):
     def encode(self, message: str) -> Tensor:
         log.debug(f"encode: {message}")
         message = trim_text_to_max_length(message)
-        encoded: Tensor = self.wrappedTokenizer.encode(
+        encoded: list[int] = self.wrappedTokenizer.encode(
             message + "\n", return_tensors="pt", truncation=True
-        )  # type: ignore
+        )
         log.debug(f"encoded: {encoded}")
-        return encoded
+        return Tensor(encoded)
 
     def decode(self, tokenized: Tensor) -> str:
         log.debug(f"decode: {tokenized}")
