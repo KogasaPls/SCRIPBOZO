@@ -1454,6 +1454,17 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "reqwest"
+version = "0.0.0"
+description = ""
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "reqwest-0.0.0-cp38-cp38-manylinux_2_28_aarch64.whl", hash = "sha256:65c729f1a80447004dd931cc5fba550d4759bcaaa89b25d6ee75de4c1c5d5cdd"},
+    {file = "reqwest-0.0.0.tar.gz", hash = "sha256:ba92209925c58d4ebb8f1a1e70b2e0511fe9d5e27cf13bac3bdd05f95ed34cf4"},
+]
+
+[[package]]
 name = "safetensors"
 version = "0.4.2"
 description = ""
@@ -2263,4 +2274,4 @@ dev = []
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "0725e3baeb2749491f00e303db1b00a5da97f82d7463f4fb942b30a4787dd57d"
+content-hash = "76cbac7d89d5c4392b8e10be08fe0282e36597244e2e8d01757f0dbb2af4a06a"

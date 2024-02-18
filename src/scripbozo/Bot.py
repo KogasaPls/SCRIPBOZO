@@ -3,6 +3,7 @@ import logging
 import sys
 import traceback
 from argparse import Namespace
+from datetime import datetime
 
 from scripbozo.Command import Command
 from scripbozo.CommandHandler import CommandHandler
@@ -36,6 +37,7 @@ class Bot(commands.Bot):
     _ignored_users: set[str] = set()
     _privileged_users: set[str] = set()
     args: Namespace = get_args_from_env()
+    _live_channels_last_updated_at: datetime
 
     def __init__(self) -> None:
         self._config = Config.from_file(self.args.config)
@@ -85,17 +87,19 @@ class Bot(commands.Bot):
         await self.update_live_channels()
 
     async def update_live_channels(self) -> None:
+        self._live_channels_last_updated_at = datetime.now()
         live_channels = await self.fetch_streams(
-            user_logins=[key for key in self._config.channels().keys()], type="live"
+            user_logins=[key.lower() for key in self._config.channels().keys()],
+            type="live",
         )
 
-        live_channel_names = [channel.user.name.lower() for channel in live_channels]
-
         for channel_name in self._config.channels().keys():
-            if channel_name in live_channel_names:
-                self.message_handler.get_channel(channel_name).is_online = True
-            else:
-                self.message_handler.get_channel(channel_name).is_online = False
+            channel = self.message_handler.get_channel(channel_name)
+            channel.is_online = channel_name in live_channels
+
+    async def update_live_channels_if_needed(self) -> None:
+        if (datetime.now() - self._live_channels_last_updated_at).total_seconds() > 600:
+            await self.update_live_channels()
 
     async def event_message(self, message) -> None:
         if self.should_ignore_message(message):
@@ -106,6 +110,7 @@ class Bot(commands.Bot):
             await self.handle_command(command, message)
             return
 
+        await self.update_live_channels_if_needed()
         await self.message_handler.handle_message(message)
 
     async def handle_command(self, command: Command, message: Message):
