@@ -10,5 +10,13 @@ no_repeat_ngram_size = 6
 repetition_penalty = 1.6
 min_length = 2
 
+[Twitch]
+auth_json = "twitch_auth.json"
+
+[Bot]
+client_timeout = 10
+max_retries_for_reply = 50
+output_max_Length = 255
+
 [Channels.moonmoon]
 offline_only = true

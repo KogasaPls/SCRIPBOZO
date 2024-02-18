@@ -73,7 +73,7 @@ class Pipeline:
             len(line) > 0
             and (" " in line or roll(0.5))
             and (len(line) >= 3 or roll(0.25))
-            and (len(line) <= self._config.output_max_length() or roll(0.1))
+            and (len(line) <= self._config.bot_output_max_length() or roll(0.1))
             and ("@" not in line or roll(0.05))
         )
 

@@ -57,7 +57,7 @@ class Config:
     def bot_max_retries_for_reply(self) -> int:
         return self.__bot().get("max_retries_for_reply", 50)
 
-    def output_max_length(self) -> int:
+    def bot_output_max_length(self) -> int:
         return self.__bot().get("output_max_length", 255)
 
     def model_output_max_tokens(self) -> int:
