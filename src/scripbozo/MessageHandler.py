@@ -45,7 +45,7 @@ class MessageHandler:
             return False
 
         channel: Channel = self.get_channel(message.channel.name)
-        if channel.is_offline_only() and not channel.is_online:
+        if channel.is_offline_only() and channel.is_online:
             self.log.info("Channel is online, ignoring message.")
             return False
 
