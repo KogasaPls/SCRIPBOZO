@@ -26,7 +26,6 @@ def get_args_from_env() -> argparse.Namespace:
     arg_parser.add_argument("--nick", envvar="NICK")
     arg_parser.add_argument("--client_id", envvar="CLIENT_ID")
     arg_parser.add_argument("--client_secret", envvar="CLIENT_SECRET")
-    arg_parser.add_argument("--initial_channels", envvar="CHANNELS")
     return arg_parser.parse_args()
 
 
@@ -60,7 +59,7 @@ class Bot(commands.Bot):
             client_secret=self.args.client_secret,
             client_id=self.args.client_id,
             nick=self.args.nick,
-            initial_channels=[],  # self.args.initial_channels.split(","),
+            initial_channels=[key for key in self._config.channels().keys()],
             token=self.auth.get_token(),
             prefix="!",
         ),
@@ -84,9 +83,6 @@ class Bot(commands.Bot):
     async def event_ready(self) -> None:
         log.info(f"Logged in as {self.nick}")
         await self.update_live_channels()
-
-        channels_to_join = self.args.initial_channels.split(",")
-        await self.join_channels(channels_to_join)
 
     async def update_live_channels(self) -> None:
         live_channels = await self.fetch_streams(

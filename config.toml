@@ -21,7 +21,9 @@ output_max_Length = 255
 offline_only = true
 
 [Channels.kogasapls]
-offline_only = true
+[Channels.traumz]
+[Channels.walnutcast]
+[Channels.kermodo]
 
 [Users]
 Bots = [
