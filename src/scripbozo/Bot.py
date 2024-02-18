@@ -98,8 +98,13 @@ class Bot(commands.Bot):
             f"Live channels: {', '.join(list((channel.user.name for channel in live_channels)))}"
         )
         for channel_name in self._config.channels().keys():
-            channel = self.message_handler.get_channel(channel_name)
-            channel.is_online = channel_name in live_channels
+            channel = self.message_handler.get_channel(channel_name.lower())
+            channel.is_online = channel_name.lower() in (
+                channel.user.name.lower() for channel in live_channels
+            )
+            log.debug(
+                f"Set channel {channel_name} to {'online' if channel.is_online else 'offline'}."
+            )
 
     async def update_live_channels_if_needed(self) -> None:
         if (
