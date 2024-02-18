@@ -37,7 +37,7 @@ class Bot(commands.Bot):
     _ignored_users: set[str] = set()
     _privileged_users: set[str] = set()
     args: Namespace = get_args_from_env()
-    _live_channels_last_updated_at: datetime
+    _live_channels_last_updated_at: datetime | None = None
 
     def __init__(self) -> None:
         self._config = Config.from_file(self.args.config)
@@ -87,18 +87,26 @@ class Bot(commands.Bot):
         await self.update_live_channels()
 
     async def update_live_channels(self) -> None:
+        log.info("Updating live channels...")
         self._live_channels_last_updated_at = datetime.now()
         live_channels = await self.fetch_streams(
             user_logins=[key.lower() for key in self._config.channels().keys()],
             type="live",
         )
 
+        log.info(
+            f"Live channels: {', '.join(list((channel.user.name for channel in live_channels)))}"
+        )
         for channel_name in self._config.channels().keys():
             channel = self.message_handler.get_channel(channel_name)
             channel.is_online = channel_name in live_channels
 
     async def update_live_channels_if_needed(self) -> None:
-        if (datetime.now() - self._live_channels_last_updated_at).total_seconds() > 600:
+        if (
+            self._live_channels_last_updated_at is None
+            or (datetime.now() - self._live_channels_last_updated_at).total_seconds()
+            > 600
+        ):
             await self.update_live_channels()
 
     async def event_message(self, message) -> None:
