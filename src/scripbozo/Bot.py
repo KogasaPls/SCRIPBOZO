@@ -172,6 +172,7 @@ class Bot(commands.Bot):
             message.echo
             or (not message.content)
             or (message.author.name.lower() in self._ignored_users)
+            or (message.content.lower().startswith("!chain"))
         )
 
     def run(self) -> None:
