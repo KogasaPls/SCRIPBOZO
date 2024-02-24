@@ -16,7 +16,6 @@ from scripbozo.util.CustomLogger import CustomLogger
 from scripbozo.util.EnvDefault import ArgParser
 from twitchio import Message
 from twitchio.ext import commands
-from twitchio.ext import routines
 
 log: logging.Logger = CustomLogger(__name__).get_logger()
 
@@ -177,10 +176,6 @@ class Bot(commands.Bot):
 
     def run(self) -> None:
         super().run()
-
-        @routines.routine(minutes=5, wait_first=True)
-        async def ignore_channels():
-            await self.update_live_channels()
 
         @self.event()
         async def event_error(error, data):
