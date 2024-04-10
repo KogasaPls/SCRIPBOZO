@@ -14,7 +14,7 @@ python = "^3.11"
 torch = { version = "2.2.0+rocm5.7", source = "torch_rocm" }
 pytorch-triton-rocm = { version = "2.2.0", source = "torch_rocm" }
 twitchio = "^2.8"
-transformers = "^4.37"
+transformers = "^4.38"
 datasets = "^2.17"
 aiolimiter = "^1.0"
 ujson = "^5.9"
