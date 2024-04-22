@@ -10,8 +10,8 @@ packages = [{ include = "scripbozo", from = "src" }]
 run = "scripbozo.__main__:main"
 
 [tool.poetry.dependencies]
-python = "^3.11"
-torch = { version = "2.2.0+rocm5.7", source = "torch_rocm" }
+python = "^3.12"
+torch = { version = "2.2.2+rocm5.7", source = "torch_rocm" }
 pytorch-triton-rocm = { version = "2.2.0", source = "torch_rocm" }
 twitchio = "^2.8"
 transformers = "^4.37"
@@ -28,7 +28,7 @@ reqwest = "^0.0.0"
 pylint = "*"
 black = "*"
 reorder-python-imports = "*"
-pre-commit = "*"
+pre-commit = "^3.7.0"
 
 [[tool.poetry.source]]
 name = "torch_rocm"
