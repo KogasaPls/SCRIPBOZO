@@ -20,7 +20,7 @@ aiolimiter = "^1.1.0"
 ujson = "^5.9.0"
 aioschedule = "^0.5"
 iso8601 = "^2.1.0"
-requests = "^2.31.0"
+requests = "^2.32.0"
 python-dotenv = "^1.0.1"
 reqwest = "^0.0.0"
 
