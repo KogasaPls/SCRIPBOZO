@@ -56,14 +56,16 @@ class Bot(commands.Bot):
         for user in self._config.users_privileged():
             self._privileged_users.add(user.lower())
 
-        super().__init__(
-            client_secret=self.args.client_secret,
-            client_id=self.args.client_id,
-            nick=self.args.nick,
-            initial_channels=[key for key in self._config.channels().keys()],
-            token=self.auth.get_token(),
-            prefix="!",
-        ),
+        (
+            super().__init__(
+                client_secret=self.args.client_secret,
+                client_id=self.args.client_id,
+                nick=self.args.nick,
+                initial_channels=[key for key in self._config.channels().keys()],
+                token=self.auth.get_token(),
+                prefix="!",
+            ),
+        )
 
     def create_message_handler(self) -> MessageHandler:
         model: GPT2Model = GPT2Model(self._config.model())
@@ -150,6 +152,8 @@ class Bot(commands.Bot):
                 await message.channel.send("moon2CL")
             case Command.MEDS:
                 pass
+            case Command.DISCROD:
+                await message.channel.send("Stagg3r DUUR")
             # new_handler = self.get_new_message_handler()
 
             case _:

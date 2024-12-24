@@ -1,53 +1,48 @@
-[tool.poetry]
+[project]
 name = "SCRIPBOZO"
 version = "0.1.0"
 description = "A Twitch chatbot based on GPT2 trained on MOONMOON's chat logs"
-authors = ["Kogasa <kogasapls@gmail.com>"]
 readme = "README.md"
-packages = [{ include = "scripbozo", from = "src" }]
+requires-python = ">=3.12"
+dependencies = [
+    "aiolimiter>=1.1.0",
+    "datasets>=2.20.0",
+    "python-dotenv>=1.0.1",
+    "requests>=2.32.3",
+    "transformers>=4.43.3",
+    "twitchio>=2.10.0",
+    "ujson>=5.10.0",
+    "torch==2.5.1+rocm6.2 ; sys_platform == 'linux'",
+    "pytorch-triton-rocm==3.1.0 ; sys_platform == 'linux'"
+]
 
-[tool.poetry.scripts]
-run = "scripbozo.__main__:main"
-
-[tool.poetry.dependencies]
-python = "^3.12"
-torch = { version = "2.2.2+rocm5.7", source = "torch_rocm" }
-pytorch-triton-rocm = { version = "2.2.0", source = "torch_rocm" }
-twitchio = "^2.9.1"
-transformers = "^4.40.0"
-datasets = "^2.19.0"
-aiolimiter = "^1.1.0"
-ujson = "^5.9.0"
-aioschedule = "^0.5"
-iso8601 = "^2.1.0"
-requests = "^2.31.0"
-python-dotenv = "^1.0.1"
-reqwest = "^0.0.0"
-
-[tool.poetry.group.dev.dependencies]
-pylint = "*"
-black = "*"
-reorder-python-imports = "*"
-pre-commit = "^3.7.0"
-
-[[tool.poetry.source]]
-name = "torch_rocm"
-url = "https://download.pytorch.org/whl/rocm5.7"
-priority = "explicit"
-
-[[tool.poetry.source]]
-name = "torch_cuda"
-url = "https://download.pytorch.org/whl/cu118"
-priority = "explicit"
-
-[[tool.poetry.source]]
-name = "torch_cpu"
-url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit"
-
-[tool.poetry.extras]
-dev = ["pylint", "black", "reorder-python-imports"]
+[project.scripts]
+SCRIPBOZO ="scripbozo.__main__:main"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+
+[[tool.uv.index]]
+name = "pytorch-rocm"
+url = "https://download.pytorch.org/whl/rocm6.2"
+explicit = true
+
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-rocm", marker = "sys_platform == 'linux'" },
+]
+pytorch-triton-rocm = [
+  { index = "pytorch-rocm", marker = "sys_platform == 'linux'" }
+]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.0.1",
+    "ruff>=0.8.4",
+    "setuptools>=75.6.0",
+]

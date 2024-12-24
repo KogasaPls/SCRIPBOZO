@@ -10,3 +10,4 @@ class Command(Enum):
     QUIT = "quit"
     CUM = "cum"
     MEDS = "meds"
+    DISCROD = "discrod"

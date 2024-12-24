@@ -99,7 +99,7 @@ class TwitchAuth:
 
     @staticmethod
     def __load_from_env() -> TwitchAuthData:
-        log.info(f"Loading auth data from environment variables.")
+        log.info("Loading auth data from environment variables.")
         data: TwitchAuthData = TwitchAuthData()
         data.data["auth_token"] = os.environ["TWITCH_AUTH_TOKEN"]
         data.data["expires_in"] = os.environ["TWITCH_AUTH_EXPIRES_IN"]
@@ -113,8 +113,8 @@ class TwitchAuth:
         self.data.save_to_file(file_path)
 
     def request_new_token_using_refresh(self) -> Any:
-        log.info(f"Requesting new token using refresh token.")
-        url: str = "https://id.twitch.tv/oauth2/token"
+        log.info("Requesting new token using refresh token.")
+        url: str = TWITCH_OAUTH_URL
         params: dict[str, str] = {
             "grant_type": "refresh_token",
             "client_id": self.client_id,
@@ -124,15 +124,29 @@ class TwitchAuth:
         response: requests.Response = requests.post(url, params=params)
         return TwitchAuthData().from_response(response)
 
+    def request_new_token(self) -> Any:
+        log.info("Requesting new auth and refresh tokens.")
+
+        {
+            "grant_type": "refresh_token",
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "refresh_token": self.data.get_refresh_token(),
+        }
+
     def update_data(self, data: TwitchAuthData) -> None:
         self.data = data
         self.save_to_file()
 
     def refresh_token(self) -> None:
-        log.info("Refreshing token.")
         try:
-            data: TwitchAuthData = self.request_new_token_using_refresh()
-            self.update_data(data)
+            if self.refresh_token:
+                log.info("Refreshing token.")
+                data: TwitchAuthData = self.request_new_token_using_refresh()
+                self.update_data(data)
+            else:
+                log.info("No refresh token, manual intervention required")
+
         except Exception as e:
             log.exception(e)
 
