@@ -12,8 +12,8 @@ dependencies = [
     "transformers>=4.43.3",
     "twitchio>=2.10.0",
     "ujson>=5.10.0",
-    "torch==2.5.1+rocm6.2 ; sys_platform == 'linux'",
-    "pytorch-triton-rocm==3.1.0 ; sys_platform == 'linux'",
+    "torch==2.6.0+rocm6.2.4 ; sys_platform == 'linux'",
+    "pytorch-triton-rocm==3.2.0 ; sys_platform == 'linux'",
 ]
 
 [project.scripts]
@@ -28,7 +28,7 @@ index-strategy = "unsafe-best-match"
 
 [[tool.uv.index]]
 name = "pytorch-rocm"
-url = "https://download.pytorch.org/whl/rocm6.2"
+url = "https://download.pytorch.org/whl/rocm6.2.4"
 explicit = true
 
 
