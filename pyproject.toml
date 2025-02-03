@@ -3,7 +3,7 @@ name = "SCRIPBOZO"
 version = "0.1.0"
 description = "A Twitch chatbot based on GPT2 trained on MOONMOON's chat logs"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "aiolimiter>=1.1.0",
     "datasets>=2.20.0",
