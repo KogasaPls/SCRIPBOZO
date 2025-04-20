@@ -5,10 +5,10 @@ description = "A Twitch chatbot based on GPT2 trained on MOONMOON's chat logs"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "aiolimiter>=1.1.0",
-    "python-dotenv>=1.0.1",
+    "aiolimiter>=1.2.1",
+    "python-dotenv>=1.1.0",
     "requests>=2.32.3",
-    "transformers>=4.43.3",
+    "transformers>=4.51.3",
     "twitchio>=2.10.0",
     "ujson>=5.10.0",
     "torch==2.6.0+rocm6.2.4 ; sys_platform == 'linux'",
@@ -41,7 +41,7 @@ pytorch-triton-rocm = [
 
 [dependency-groups]
 dev = [
-    "pre-commit>=4.0.1",
-    "ruff>=0.8.4",
-    "setuptools>=75.6.0",
+    "pre-commit>=4.2.0",
+    "ruff>=0.11.6",
+    "setuptools>=79.0.0",
 ]
