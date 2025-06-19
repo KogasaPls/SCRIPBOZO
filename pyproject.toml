@@ -7,12 +7,12 @@ requires-python = ">=3.13"
 dependencies = [
     "aiolimiter>=1.2.1",
     "python-dotenv>=1.1.0",
-    "requests>=2.32.3",
-    "transformers>=4.51.3",
+    "requests>=2.32.4",
+    "transformers>=4.52.4",
     "twitchio>=2.10.0",
     "ujson>=5.10.0",
-    "torch==2.6.0+rocm6.2.4 ; sys_platform == 'linux'",
-    "pytorch-triton-rocm==3.2.0 ; sys_platform == 'linux'",
+    "torch==2.7.1+rocm6.3 ; sys_platform == 'linux'",
+    "pytorch-triton-rocm>=3.3.0 ; sys_platform == 'linux'",
 ]
 
 [project.scripts]
@@ -27,7 +27,7 @@ index-strategy = "unsafe-best-match"
 
 [[tool.uv.index]]
 name = "pytorch-rocm"
-url = "https://download.pytorch.org/whl/rocm6.2.4"
+url = "https://download.pytorch.org/whl/rocm6.3"
 explicit = true
 
 
@@ -42,6 +42,6 @@ pytorch-triton-rocm = [
 [dependency-groups]
 dev = [
     "pre-commit>=4.2.0",
-    "ruff>=0.11.6",
-    "setuptools>=79.0.0",
+    "ruff>=0.12.0",
+    "setuptools>=80.9.0",
 ]
