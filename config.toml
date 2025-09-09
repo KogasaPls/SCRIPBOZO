@@ -35,7 +35,8 @@ Bots = [
     "poopthefirst",
     "markov_chain_bot",
     "sumbot",
-    "scripbozo"
+    "scripbozo",
+    "bigwunkus"
 ]
 Ignored = [
     "ruinsofmaya"
